@@ -1,0 +1,214 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  background: #f5f7fb;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #0a3d62;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar ul li {
+  padding: 12px 0;
+  cursor: pointer;
+}
+
+.sidebar ul li:hover {
+  background: rgba(255,255,255,0.12);
+  padding-left: 8px;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Welcome box */
+/* ===== Welcome Header (Customer) ===== */
+.welcome-box {
+  margin-bottom: 30px;
+  padding: 22px 26px;
+  background: linear-gradient(135deg, #0a3d62, #1e90ff);
+  color: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-left h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.welcome-sub {
+  font-size: 14px;
+  opacity: 0.95;
+  margin-bottom: 4px;
+}
+
+.welcome-address {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Sections */
+.section.hidden {
+  display: none;
+}
+
+/* Account cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.account-card {
+  background: white;
+  padding: 18px;
+  border-radius: 6px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+}
+
+.account-card h4 {
+  color: #0a3d62;
+}
+
+.balance {
+  margin-top: 10px;
+  font-size: 22px;
+  color: #1e90ff;
+  font-weight: 600;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin-top: 15px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+/* =========================
+   PROFILE – MODERN BANK UI
+========================= */
+
+.section-title {
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0a3d62;
+}
+
+/* Center the profile card */
+.profile-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Main profile card */
+.profile-card {
+  width: 100%;
+  max-width: 650px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 25px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Each row */
+.profile-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eef1f5;
+}
+
+/* Remove border for last row */
+.profile-row:last-child {
+  border-bottom: none;
+}
+
+/* Labels */
+.profile-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Values */
+.profile-value {
+  font-size: 15px;
+  color: #0a3d62;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* Hover feedback (subtle) */
+.profile-row:hover {
+  background: #f9fbff;
+  margin: 0 -25px;
+  padding-left: 25px;
+  padding-right: 25px;
+  border-radius: 6px;
+}
+
+/* Real-time date & time */
+.welcome-time {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* =========================
+   CUSTOMER ACTION CARDS
+========================= */
+
+.employee-container {
+  padding: 20px;
+}
+
+/* Action cards layout */
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+/* Individual card */
+.action-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #0a3d62;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover effect */
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+}
+
+/* Logout card */
+.action-card.logout {
+  color: #b91c1c;
+}

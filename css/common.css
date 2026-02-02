@@ -1,0 +1,78 @@
+/* common.css */
+
+:root {
+  --primary: #0a3d62;
+  --secondary: #1e90ff;
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #2f3640;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+/* =========================
+   ICONS (PURE CSS / TEXT)
+========================= */
+.icon {
+  margin-right: 6px;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+/* =========================
+   LOADER
+========================= */
+.loader {
+  padding: 20px;
+  text-align: center;
+  color: #555;
+  font-size: 14px;
+}
+
+.loader::after {
+  content: "Loading...";
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0% { content: "Loading"; }
+  33% { content: "Loading."; }
+  66% { content: "Loading.."; }
+  100% { content: "Loading..."; }
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.empty-state {
+  padding: 25px;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}
+
+/* =========================
+   DISABLED LOOK
+========================= */
+.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}

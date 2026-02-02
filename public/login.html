@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | SecureBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="../css/base.css" />
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">
+      🏦 SecureBank
+    </div>
+
+    <nav>
+      <a href="index.html" class="nav-btn">Home</a>
+    </nav>
+  </header>
+
+  <!-- LOGIN CONTAINER -->
+  <main class="login-wrapper">
+    <div class="login-card">
+      <h2>Welcome Back</h2>
+      <p class="login-subtitle">
+        Login to access your banking dashboard
+      </p>
+
+      <div class="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter your username" required />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required />
+        </div>
+
+        <button type="submit" class="primary-btn full-width" onclick="login()">
+          Login
+        </button>
+
+        <p id="loginMsg" class="login-msg"></p>
+      </div>
+
+      <div class="login-footer">
+        <span>Authorized access only</span>
+      </div>
+    </div>
+  </main>
+  <script src="../js/config.js"></script>
+  <script src="../js/login.js"></script>
+</body>
+
+</html>

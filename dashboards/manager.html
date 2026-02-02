@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manager Dashboard</title>
+
+  <link rel="stylesheet" href="../css/common.css" />
+  <link rel="stylesheet" href="../css/manager.css" />
+</head>
+
+<body>
+
+<main class="employee-container">
+
+  <!-- WELCOME HEADER -->
+  <section class="welcome-box">
+    <h2 id="welcomeText">Welcome</h2>
+    <p id="branchInfo">Branch: —</p>
+    <p class="welcome-time" id="welcomeTime"></p>
+  </section>
+
+  <!-- ACTION CARDS -->
+  <section class="action-cards">
+    <div class="action-card" onclick="showSection('dashboard')">
+      📊 Branch Summary
+    </div>
+
+    <div class="action-card" onclick="openEmployees()">
+      👨‍💼 Employees
+    </div>
+
+    <div class="action-card" onclick="openCustomers()">
+      👥 Customers
+    </div>
+
+    <div class="action-card logout" onclick="logout()">
+      🚪 Logout
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section">
+    <h3>Branch Summary</h3>
+
+    <div class="cards">
+      <div class="card">
+        <h4>Total Employees</h4>
+        <p id="empCount">—</p>
+      </div>
+
+      <div class="card">
+        <h4>Total Customers</h4>
+        <p id="custCount">—</p>
+      </div>
+
+      <div class="card">
+        <h4>Total Accounts</h4>
+        <p id="accCount">—</p>
+      </div>
+
+      <div class="card">
+        <h4>Branch Balance</h4>
+        <p id="branchBalance">₹ —</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EMPLOYEES -->
+  <section id="employees" class="section hidden">
+    <h3>Branch Employees</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="employeeTable"></tbody>
+    </table>
+  </section>
+
+  <!-- CUSTOMERS -->
+  <section id="customers" class="section hidden">
+    <h3>Branch Customers</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody id="customerTable"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/manager.js"></script>
+
+<script>
+  protectPage("MANAGER");
+  loadManagerDashboard();
+</script>
+
+</body>
+</html>
