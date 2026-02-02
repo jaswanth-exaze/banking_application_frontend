@@ -13,5 +13,5 @@ function protectPage(role) {
 
 function logout() {
   localStorage.clear();
-  window.location.href = "../public/login.html";
+  window.location.href = "/public/login.html";
 }
