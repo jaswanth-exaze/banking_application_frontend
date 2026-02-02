@@ -255,6 +255,6 @@ function logoutEmployee() {
   localStorage.removeItem("user");
 
   // Redirect to login page
-  window.location.href = "/public/login.html";
+  window.location.href = "/login.html";
   // 👆 adjust path if your login page is different
 }

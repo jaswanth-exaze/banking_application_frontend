@@ -7,11 +7,11 @@ function protectPage(role) {
   const userRole = localStorage.getItem("role");
 
   if (!token || userRole !== role) {
-    window.location.href = "../public/login.html";
+    window.location.href = "/login.html";
   }
 }
 
 function logout() {
   localStorage.clear();
-  window.location.href = "/public/login.html";
+  window.location.href = "/login.html";
 }
