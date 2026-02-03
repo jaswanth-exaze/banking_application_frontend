@@ -148,12 +148,15 @@ async function openTransactions() {
     }
 
     txns.forEach((t) => {
+      const type = String(t.transaction_type || "").toLowerCase();
+      const typeClass =
+        type === "credit" ? "txn-credit" : type === "debit" ? "txn-debit" : "";
       tbody.innerHTML += `
         <tr>
           <td>${new Date(t.created_at).toLocaleDateString("en-IN")}</td>
           <td>${t.description}</td>
-          <td>${t.transaction_type}</td>
-          <td>₹ ${Number(t.amount).toLocaleString("en-IN")}</td>
+          <td class="${typeClass}">${t.transaction_type}</td>
+          <td class="${typeClass}">&#8377; ${Number(t.amount).toLocaleString("en-IN")}</td>
         </tr>
       `;
     });
@@ -205,3 +208,5 @@ async function openProfile() {
     console.error("Profile load error:", err);
   }
 }
+
+

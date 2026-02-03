@@ -80,12 +80,15 @@ async function loadEmployees() {
     }
 
     employees.forEach(e => {
+      const fullName = `${e.first_name || ""} ${e.last_name || ""}`.trim();
       tbody.innerHTML += `
         <tr>
-          <td>${e.user_id}</td>
-          <td>${e.username}</td>
-          <td>${e.role_name}</td>
-          <td>${e.is_active ? "Active" : "Inactive"}</td>
+        <td>${e.employee_id || "—"}</td>
+        <td>${e.user_id || "—"}</td>
+          <td>${fullName || "—"}</td>
+          <td>${e.email || "—"}</td>
+          <td>${e.role_name || "—"}</td>
+          <td>${e.phone || "—"}</td>
         </tr>
       `;
     });
