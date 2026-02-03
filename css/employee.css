@@ -147,3 +147,65 @@ th {
   padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1024px) {
+  .employee-container {
+    padding: 20px;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-container {
+    padding: 16px;
+  }
+
+  .welcome-box {
+    padding: 18px;
+  }
+
+  .action-cards {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .form {
+    max-width: 100%;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+
+  .profile-card {
+    max-width: 100%;
+  }
+
+  .profile-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-box h2 {
+    font-size: 20px;
+  }
+}

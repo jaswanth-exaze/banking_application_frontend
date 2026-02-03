@@ -214,3 +214,91 @@ body {
   font-size: 12px;
   color: #6b7280;
 }
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 16px 28px;
+  }
+
+  .hero {
+    padding: 32px 24px;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+
+  .features {
+    padding: 48px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 20px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 28px 18px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  .primary-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .features {
+    padding: 36px 18px;
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 18px;
+  }
+
+  .login-wrapper {
+    padding: 24px 16px;
+  }
+
+  .login-card {
+    max-width: 100%;
+    padding: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 14px;
+  }
+
+  .nav-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .note {
+    font-size: 12px;
+  }
+}

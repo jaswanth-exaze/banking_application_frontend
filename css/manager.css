@@ -176,3 +176,47 @@ tr:hover {
 .action-card.logout {
   color: #b91c1c;
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1024px) {
+  .employee-container {
+    padding: 18px;
+  }
+
+  .cards {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-container {
+    padding: 16px;
+  }
+
+  .welcome-box {
+    padding: 16px;
+  }
+
+  .action-cards {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-box h2 {
+    font-size: 20px;
+  }
+}

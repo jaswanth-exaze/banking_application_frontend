@@ -212,3 +212,67 @@ th, td {
 .action-card.logout {
   color: #b91c1c;
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1024px) {
+  .welcome-box {
+    padding: 18px 20px;
+  }
+
+  .cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-container {
+    padding: 16px;
+  }
+
+  .welcome-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .action-cards {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .action-card {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .profile-card {
+    padding: 12px 18px;
+  }
+
+  .profile-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-left h2 {
+    font-size: 20px;
+  }
+
+  .balance {
+    font-size: 18px;
+  }
+}

@@ -28,6 +28,21 @@ a {
 button {
   cursor: pointer;
 }
+
+/* =========================
+   RESPONSIVE HELPERS
+========================= */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .empty-state {
+    padding: 18px;
+    font-size: 13px;
+  }
+}
 /* =========================
    ICONS (PURE CSS / TEXT)
 ========================= */
