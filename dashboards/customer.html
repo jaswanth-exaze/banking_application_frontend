@@ -3,118 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <title>Customer Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="/css/common.css" />
   <link rel="stylesheet" href="/css/customer.css" />
 </head>
 
-<body>
+<body class="app">
 
-<main class="employee-container">
-
-  <!-- WELCOME HEADER -->
-  <section class="welcome-box">
-    <div class="welcome-left">
-      <h2 id="welcomeText">Welcome</h2>
-      <p class="welcome-sub" id="branchText"></p>
-      <p class="welcome-address" id="branchAddress"></p>
-      <p class="welcome-time" id="welcomeTime"></p>
-    </div>
-  </section>
-
-  <!-- ACTION CARDS -->
-  <section class="action-cards">
-    <div class="action-card" onclick="openAccounts()">
-      💳 My Accounts
-    </div>
-
-    <div class="action-card" onclick="openTransactions()">
-      📄 My Transactions
-    </div>
-
-    <div class="action-card" onclick="openProfile()">
-      👤 My Profile
-    </div>
-
-    <div class="action-card logout" onclick="logout()">
-      🚪 Logout
-    </div>
-  </section>
-
-  <!-- ACCOUNTS -->
-  <section id="accountsSection" class="section">
-    <h3>My Accounts</h3>
-    <div id="accountsContainer" class="cards"></div>
-  </section>
-
-  <!-- TRANSACTIONS -->
-  <section id="transactionsSection" class="section hidden">
-    <h3>My Transactions</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Type</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody id="txnTable"></tbody>
-    </table>
-  </section>
-
-  <!-- PROFILE -->
-  <section id="profileSection" class="section hidden">
-    <h3 class="section-title">My Profile</h3>
-
-    <div class="profile-wrapper">
-      <div class="profile-card">
-
-        <div class="profile-row">
-          <span class="profile-label">Full Name</span>
-          <span class="profile-value" id="profName">—</span>
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="brand">
+        <div class="brand-mark">🏦</div>
+        <div>
+          <div class="brand-name">SecureBank</div>
+          <div class="brand-sub">Customer Portal</div>
         </div>
-
-        <div class="profile-row">
-          <span class="profile-label">Username</span>
-          <span class="profile-value" id="profUsername">—</span>
-        </div>
-
-        <div class="profile-row">
-          <span class="profile-label">Email</span>
-          <span class="profile-value" id="profEmail">—</span>
-        </div>
-
-        <div class="profile-row">
-          <span class="profile-label">Phone</span>
-          <span class="profile-value" id="profPhone">—</span>
-        </div>
-
-        <div class="profile-row">
-          <span class="profile-label">Branch</span>
-          <span class="profile-value" id="profBranch">—</span>
-        </div>
-
-        <div class="profile-row">
-          <span class="profile-label">Branch Address</span>
-          <span class="profile-value" id="profBranchAddress">—</span>
-        </div>
-
       </div>
+
+      <nav class="nav">
+        <button class="nav-item" data-section="accounts" onclick="openAccounts()">Accounts</button>
+        <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
+        <button class="nav-item" data-section="profile" onclick="openProfile()">Profile</button>
+      </nav>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div>
+          <h2 id="welcomeText">Welcome</h2>
+          <div class="topbar-meta">
+            <span id="branchText"></span>
+            <span class="dot">•</span>
+            <span id="branchAddress"></span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="topbar-time" id="welcomeTime"></span>
+          <button class="topbar-btn" onclick="logout()">Logout</button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- ACCOUNTS -->
+        <section id="accountsSection" class="section">
+          <div class="section-head">
+            <h3>My Accounts</h3>
+            <p class="section-sub">Overview of your active accounts</p>
+          </div>
+          <div id="accountsContainer" class="cards"></div>
+        </section>
+
+        <!-- TRANSACTIONS -->
+        <section id="transactionsSection" class="section hidden">
+          <div class="section-head">
+            <h3>My Transactions</h3>
+            <p class="section-sub">Latest account activity</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="txnTable"></tbody>
+          </table>
+        </section>
+
+        <!-- PROFILE -->
+        <section id="profileSection" class="section hidden">
+          <div class="section-head">
+            <h3>My Profile</h3>
+            <p class="section-sub">Personal and branch details</p>
+          </div>
+
+          <div class="profile-wrapper">
+            <div class="profile-card">
+              <div class="profile-row">
+                <span class="profile-label">Full Name</span>
+                <span class="profile-value" id="profName">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="profile-label">Username</span>
+                <span class="profile-value" id="profUsername">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="profile-label">Email</span>
+                <span class="profile-value" id="profEmail">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="profile-label">Phone</span>
+                <span class="profile-value" id="profPhone">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="profile-label">Branch</span>
+                <span class="profile-value" id="profBranch">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="profile-label">Branch Address</span>
+                <span class="profile-value" id="profBranchAddress">—</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
-  </section>
+  </div>
 
-</main>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/customer.js"></script>
 
-<script src="/js/config.js"></script>
-<script src="/js/auth.js"></script>
-<script src="/js/customer.js"></script>
-
-<script>
-  protectPage("CUSTOMER");
-  loadCustomerDashboard();
-</script>
+  <script>
+    protectPage("CUSTOMER");
+    loadCustomerDashboard();
+  </script>
 
 </body>
 </html>

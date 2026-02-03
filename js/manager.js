@@ -6,6 +6,20 @@ function showSection(id) {
     sec.classList.add("hidden")
   );
   document.getElementById(id).classList.remove("hidden");
+  const map = {
+    dashboard: "dashboard",
+    employees: "employees",
+    customers: "customers",
+  };
+  setActiveNav(map[id] || id);
+}
+
+function setActiveNav(key) {
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  const target = document.querySelector(`.nav-item[data-section="${key}"]`);
+  if (target) target.classList.add("active");
 }
 
 /* DASHBOARD */

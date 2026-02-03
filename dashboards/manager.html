@@ -3,114 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <title>Manager Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" href="../css/common.css" />
-  <link rel="stylesheet" href="../css/manager.css" />
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/manager.css" />
 </head>
 
-<body>
+<body class="app">
 
-<main class="employee-container">
-
-  <!-- WELCOME HEADER -->
-  <section class="welcome-box">
-    <h2 id="welcomeText">Welcome</h2>
-    <p id="branchInfo">Branch: —</p>
-    <p class="welcome-time" id="welcomeTime"></p>
-  </section>
-
-  <!-- ACTION CARDS -->
-  <section class="action-cards">
-    <div class="action-card" onclick="showSection('dashboard')">
-      📊 Branch Summary
-    </div>
-
-    <div class="action-card" onclick="openEmployees()">
-      👨‍💼 Employees
-    </div>
-
-    <div class="action-card" onclick="openCustomers()">
-      👥 Customers
-    </div>
-
-    <div class="action-card logout" onclick="logout()">
-      🚪 Logout
-    </div>
-  </section>
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="section">
-    <h3>Branch Summary</h3>
-
-    <div class="cards">
-      <div class="card">
-        <h4>Total Employees</h4>
-        <p id="empCount">—</p>
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="brand">
+        <div class="brand-mark">🏦</div>
+        <div>
+          <div class="brand-name">SecureBank</div>
+          <div class="brand-sub">Manager Console</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h4>Total Customers</h4>
-        <p id="custCount">—</p>
-      </div>
+      <nav class="nav">
+        <button class="nav-item" data-section="dashboard" onclick="showSection('dashboard')">Summary</button>
+        <button class="nav-item" data-section="employees" onclick="openEmployees()">Employees</button>
+        <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+      </nav>
+    </aside>
 
-      <div class="card">
-        <h4>Total Accounts</h4>
-        <p id="accCount">—</p>
-      </div>
+    <div class="app-main">
+      <header class="app-topbar">
+        <div>
+          <h2 id="welcomeText">Welcome</h2>
+          <div class="topbar-meta">
+            <span id="branchInfo">Branch: —</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="topbar-time" id="welcomeTime"></span>
+          <button class="topbar-btn" onclick="logout()">Logout</button>
+        </div>
+      </header>
 
-      <div class="card">
-        <h4>Branch Balance</h4>
-        <p id="branchBalance">₹ —</p>
-      </div>
+      <main class="app-content">
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="section">
+          <div class="section-head">
+            <h3>Branch Summary</h3>
+            <p class="section-sub">Key metrics for your branch</p>
+          </div>
+
+          <div class="cards">
+            <div class="card">
+              <h4>Total Employees</h4>
+              <p id="empCount">—</p>
+            </div>
+
+            <div class="card">
+              <h4>Total Customers</h4>
+              <p id="custCount">—</p>
+            </div>
+
+            <div class="card">
+              <h4>Total Accounts</h4>
+              <p id="accCount">—</p>
+            </div>
+
+            <div class="card">
+              <h4>Branch Balance</h4>
+              <p id="branchBalance">₹ —</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- EMPLOYEES -->
+        <section id="employees" class="section hidden">
+          <div class="section-head">
+            <h3>Branch Employees</h3>
+            <p class="section-sub">Active employee roster</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>USER ID</th>
+                <th>EMPLOYEE ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Phone</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTable"></tbody>
+          </table>
+        </section>
+
+        <!-- CUSTOMERS -->
+        <section id="customers" class="section hidden">
+          <div class="section-head">
+            <h3>Branch Customers</h3>
+            <p class="section-sub">Customer list for this branch</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+              </tr>
+            </thead>
+            <tbody id="customerTable"></tbody>
+          </table>
+        </section>
+      </main>
     </div>
-  </section>
+  </div>
 
-  <!-- EMPLOYEES -->
-  <section id="employees" class="section hidden">
-    <h3>Branch Employees</h3>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/manager.js"></script>
 
-    <table>
-      <thead>
-        <tr>
-          <th>EMPLOYEE ID</th>
-          <th>USER ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Phone</th>
-        </tr>
-      </thead>
-      <tbody id="employeeTable"></tbody>
-    </table>
-  </section>
-
-  <!-- CUSTOMERS -->
-  <section id="customers" class="section hidden">
-    <h3>Branch Customers</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-        </tr>
-      </thead>
-      <tbody id="customerTable"></tbody>
-    </table>
-  </section>
-
-</main>
-
-<script src="../js/config.js"></script>
-<script src="../js/auth.js"></script>
-<script src="../js/manager.js"></script>
-
-<script>
-  protectPage("MANAGER");
-  loadManagerDashboard();
-</script>
+  <script>
+    protectPage("MANAGER");
+    loadManagerDashboard();
+  </script>
 
 </body>
 </html>

@@ -4,173 +4,184 @@
 <head>
   <meta charset="UTF-8" />
   <title>Employee Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="/css/common.css" />
   <link rel="stylesheet" href="/css/employee.css" />
 </head>
 
-<body>
+<body class="app">
 
-  <main class="employee-container">
-
-    <!-- WELCOME HEADER -->
-    <section class="welcome-box">
-      <h2 id="welcomeText">Good Morning, Employee</h2>
-      <p class="welcome-branch" id="branchText">
-        Hyderabad Main Branch • HYD001
-      </p>
-      <p class="welcome-role">Branch Operations Dashboard</p>
-      <p class="welcome-time" id="welcomeTime"></p>
-    </section>
-
-    <!-- ACTION CARDS -->
-    <section class="action-cards">
-      <div class="action-card" onclick="showSection('dashboardSection')">
-        📊 Branch Summary
-      </div>
-
-      <div class="action-card" onclick="openCustomers()">
-        👥 View Customers
-      </div>
-
-      <div class="action-card" onclick="showSection('onboardSection')">
-        ➕ Onboard Customer
-      </div>
-
-      <div class="action-card" onclick="showSection('profileSection')">
-        👤 My Profile
-      </div>
-
-      <div class="action-card logout" id="logoutBtn">
-        🚪 Logout
-      </div>
-    </section>
-
-    <!-- BRANCH SUMMARY (DEFAULT) -->
-    <section id="dashboardSection" class="section">
-      <h3>Branch Summary</h3>
-
-      <div class="summary-cards">
-        <div class="summary-card">
-          <p>Total Customers</p>
-          <h2 id="totalCustomers">—</h2>
-        </div>
-
-        <div class="summary-card">
-          <p>Branch Balance</p>
-          <h2 id="branchBalance">₹ —</h2>
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="brand">
+        <div class="brand-mark">🏦</div>
+        <div>
+          <div class="brand-name">SecureBank</div>
+          <div class="brand-sub">Employee Desk</div>
         </div>
       </div>
-    </section>
 
-    <!-- CUSTOMERS -->
-    <section id="customersSection" class="section hidden">
-      <h3>Branch Customers</h3>
+      <nav class="nav">
+        <button class="nav-item" data-section="dashboard" onclick="showSection('dashboardSection')">Summary</button>
+        <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+        <button class="nav-item" data-section="onboard" onclick="showSection('onboardSection')">Onboard</button>
+        <button class="nav-item" data-section="profile" onclick="showSection('profileSection')">Profile</button>
+      </nav>
+    </aside>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-          </tr>
-        </thead>
-        <tbody id="customerTable">
-          <tr>
-            <td colspan="4" class="empty-state">
-              Click “View Customers” to load data
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ONBOARD CUSTOMER (MERGED FLOW) -->
-    <section id="onboardSection" class="section hidden">
-      <h3>Onboard New Customer</h3>
-
-      <form id="onboardForm" class="form">
-        <input id="obUsername" type="text" placeholder="Username" required />
-        <input id="obPassword" type="password" placeholder="Temporary Password" required />
-
-        <input id="obFirstName" type="text" placeholder="First Name" required />
-        <input id="obLastName" type="text" placeholder="Last Name" required />
-
-        <input id="obEmail" type="email" placeholder="Email" required />
-        <input id="obPhone" type="text" placeholder="Phone" required />
-
-        <label class="checkbox">
-          <input type="checkbox" id="createAccountChk" />
-          Create account now
-        </label>
-
-        <select id="obAccType">
-          <option value="SAVINGS">Savings</option>
-          <option value="CURRENT">Current</option>
-        </select>
-
-        <input id="obOpeningBalance" type="number" placeholder="Opening Balance" />
-
-        <button type="submit">Onboard Customer</button>
-
-        <p id="onboardMsg"></p>
-      </form>
-    </section>
-
-    <!-- EMPLOYEE PROFILE -->
-    <section id="profileSection" class="section hidden">
-      <h3>My Profile</h3>
-
-      <div class="profile-container">
-        <div class="profile-card">
-          <h4>Employee Information</h4>
-
-          <div class="profile-row">
-            <span class="label">Name</span>
-            <span class="value" id="empUsername">—</span>
+    <div class="app-main">
+      <header class="app-topbar">
+        <div>
+          <h2 id="welcomeText">Good Morning, Employee</h2>
+          <div class="topbar-meta">
+            <span id="branchText">—</span>
+            <span class="dot">•</span>
+            <span class="topbar-role">Branch Operations</span>
           </div>
-
-          <div class="profile-row">
-            <span class="label">Designation</span>
-            <span class="value" id="empDesignation">—</span>
-          </div>
-
-          <div class="profile-row">
-            <span class="label">Joined Date</span>
-            <span class="value" id="empJoined">—</span>
-          </div>
-
-          <div class="profile-row">
-            <span class="label">Gender</span>
-            <span class="value" id="empGender">—</span>
-          </div>
-
-          <div class="profile-row">
-            <span class="label">Email</span>
-            <span class="value" id="empEmail">—</span>
-          </div>
-
-          <div class="profile-row">
-            <span class="label">Phone</span>
-            <span class="value" id="empPhone">—</span>
-          </div>
-
-          <div class="profile-row">
-            <span class="label">Branch</span>
-            <span class="value" id="empBranch">—</span>
-          </div>
-
-          <div class="profile-row">
-            <span class="label">Salary</span>
-            <span class="value" id="empSalary">₹ ****</span>
-          </div>
-
         </div>
-      </div>
-    </section>
+        <div class="topbar-actions">
+          <span class="topbar-time" id="welcomeTime"></span>
+          <button class="topbar-btn" id="logoutBtn">Logout</button>
+        </div>
+      </header>
 
-  </main>
+      <main class="app-content">
+        <!-- BRANCH SUMMARY -->
+        <section id="dashboardSection" class="section">
+          <div class="section-head">
+            <h3>Branch Summary</h3>
+            <p class="section-sub">Real-time overview of branch activity</p>
+          </div>
+
+          <div class="summary-cards">
+            <div class="summary-card">
+              <p>Total Customers</p>
+              <h2 id="totalCustomers">—</h2>
+            </div>
+
+            <div class="summary-card">
+              <p>Branch Balance</p>
+              <h2 id="branchBalance">₹ —</h2>
+            </div>
+          </div>
+        </section>
+
+        <!-- CUSTOMERS -->
+        <section id="customersSection" class="section hidden">
+          <div class="section-head">
+            <h3>Branch Customers</h3>
+            <p class="section-sub">All customers linked to your branch</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+              </tr>
+            </thead>
+            <tbody id="customerTable">
+              <tr>
+                <td colspan="4" class="empty-state">
+                  Click “View Customers” to load data
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ONBOARD CUSTOMER -->
+        <section id="onboardSection" class="section hidden">
+          <div class="section-head">
+            <h3>Onboard New Customer</h3>
+            <p class="section-sub">Create a new profile and optional account</p>
+          </div>
+
+          <form id="onboardForm" class="form">
+            <input id="obUsername" type="text" placeholder="Username" required />
+            <input id="obPassword" type="password" placeholder="Temporary Password" required />
+
+            <input id="obFirstName" type="text" placeholder="First Name" required />
+            <input id="obLastName" type="text" placeholder="Last Name" required />
+
+            <input id="obEmail" type="email" placeholder="Email" required />
+            <input id="obPhone" type="text" placeholder="Phone" required />
+
+            <label class="checkbox">
+              <input type="checkbox" id="createAccountChk" />
+              Create account now
+            </label>
+
+            <select id="obAccType">
+              <option value="SAVINGS">Savings</option>
+              <option value="CURRENT">Current</option>
+            </select>
+
+            <input id="obOpeningBalance" type="number" placeholder="Opening Balance" />
+
+            <button type="submit">Onboard Customer</button>
+
+            <p id="onboardMsg"></p>
+          </form>
+        </section>
+
+        <!-- EMPLOYEE PROFILE -->
+        <section id="profileSection" class="section hidden">
+          <div class="section-head">
+            <h3>My Profile</h3>
+            <p class="section-sub">Your employee details</p>
+          </div>
+
+          <div class="profile-container">
+            <div class="profile-card">
+              <div class="profile-row">
+                <span class="label">Name</span>
+                <span class="value" id="empUsername">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Designation</span>
+                <span class="value" id="empDesignation">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Joined Date</span>
+                <span class="value" id="empJoined">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Gender</span>
+                <span class="value" id="empGender">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Email</span>
+                <span class="value" id="empEmail">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Phone</span>
+                <span class="value" id="empPhone">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Branch</span>
+                <span class="value" id="empBranch">—</span>
+              </div>
+
+              <div class="profile-row">
+                <span class="label">Salary</span>
+                <span class="value" id="empSalary">₹ ****</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
 
   <script src="/js/config.js"></script>
   <script src="/js/employee.js"></script>

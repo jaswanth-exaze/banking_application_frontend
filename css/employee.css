@@ -2,8 +2,8 @@
 .form {
   background: #f8fbff;
   border: 1px dashed #d8e3f2;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 18px;
+  border-radius: 14px;
 }
 
 .form button {
@@ -12,4 +12,16 @@
 
 .profile-card {
   max-width: 760px;
+}
+
+@media (min-width: 900px) {
+  .form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form .checkbox,
+  .form button,
+  .form #onboardMsg {
+    grid-column: 1 / -1;
+  }
 }

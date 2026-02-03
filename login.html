@@ -9,23 +9,35 @@
   <link rel="stylesheet" href="/css/base.css" />
 </head>
 
-<body>
+<body class="public">
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="logo">
-      🏦 SecureBank
+  <header class="public-header minimal">
+    <div class="brand">
+      <span class="brand-mark">🏦</span>
+      <div>
+        <div class="brand-name">SecureBank</div>
+        <div class="brand-tag">Secure Access Portal</div>
+      </div>
     </div>
 
-    <nav>
-      <a href="index.html" class="nav-btn">Home</a>
-    </nav>
+    <a href="index.html" class="btn ghost">Back to Home</a>
   </header>
 
-  <!-- LOGIN CONTAINER -->
-  <main class="login-wrapper">
-    <div class="login-card">
-      <h2>Welcome Back</h2>
+  <main class="login-shell">
+    <section class="login-visual">
+      <h1>Welcome back</h1>
+      <p>
+        Access your secure dashboards and manage daily operations with confidence.
+      </p>
+      <div class="login-badges">
+        <span class="chip">Encrypted sessions</span>
+        <span class="chip">Role-based access</span>
+        <span class="chip">Audit-ready</span>
+      </div>
+    </section>
+
+    <section class="login-card">
+      <h2>Sign in</h2>
       <p class="login-subtitle">
         Login to access your banking dashboard
       </p>
@@ -41,7 +53,7 @@
           <input type="password" id="password" placeholder="Enter your password" required />
         </div>
 
-        <button type="submit" class="primary-btn full-width" onclick="login()">
+        <button type="submit" class="btn primary full-width" onclick="login()">
           Login
         </button>
 
@@ -51,8 +63,9 @@
       <div class="login-footer">
         <span>Authorized access only</span>
       </div>
-    </div>
+    </section>
   </main>
+
   <script src="/js/config.js"></script>
   <script src="/js/login.js"></script>
 </body>

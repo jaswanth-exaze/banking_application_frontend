@@ -8,6 +8,20 @@ function showSection(id) {
     section.classList.add("hidden");
   });
   document.getElementById(id).classList.remove("hidden");
+  const map = {
+    accountsSection: "accounts",
+    transactionsSection: "transactions",
+    profileSection: "profile",
+  };
+  setActiveNav(map[id] || id);
+}
+
+function setActiveNav(key) {
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  const target = document.querySelector(`.nav-item[data-section="${key}"]`);
+  if (target) target.classList.add("active");
 }
 
 /* =========================

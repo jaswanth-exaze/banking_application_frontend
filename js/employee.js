@@ -13,6 +13,21 @@ function showSection(sectionId) {
     sec.classList.add("hidden");
   });
   document.getElementById(sectionId).classList.remove("hidden");
+  const map = {
+    dashboardSection: "dashboard",
+    customersSection: "customers",
+    onboardSection: "onboard",
+    profileSection: "profile",
+  };
+  setActiveNav(map[sectionId] || sectionId);
+}
+
+function setActiveNav(key) {
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  const target = document.querySelector(`.nav-item[data-section="${key}"]`);
+  if (target) target.classList.add("active");
 }
 
 function getAuthHeader() {
