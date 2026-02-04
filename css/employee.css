@@ -1,7 +1,7 @@
 /* employee.css - employee dashboard tweaks */
 .form {
-  background: #f8fbff;
-  border: 1px dashed #d8e3f2;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
   padding: 18px;
   border-radius: 14px;
 }

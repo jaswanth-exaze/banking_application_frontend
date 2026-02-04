@@ -1,5 +1,3 @@
-console.log("customer.js loaded");
-
 /* =========================
    SECTION HANDLER
 ========================= */

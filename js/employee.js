@@ -2,8 +2,6 @@
    EMPLOYEE DASHBOARD SCRIPT
    ========================================================= */
 
-console.log("employee.js loaded");
-
 /* =========================================================
    BASIC HELPERS
 ========================================================= */
@@ -246,8 +244,6 @@ async function onboardCustomer(e) {
    INIT
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", initEmployeeDashboard);
-
 document.addEventListener("DOMContentLoaded", () => {
   initEmployeeDashboard();
 
@@ -270,6 +266,6 @@ function logoutEmployee() {
   localStorage.removeItem("user");
 
   // Redirect to login page
-  window.location.href = "/login.html";
+  window.location.href = "/public/login.html";
   // 👆 adjust path if your login page is different
 }

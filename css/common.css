@@ -9,10 +9,14 @@
   --muted: #64748b;
   --bg: #f3f6fb;
   --card: #ffffff;
+  --surface: #ffffff;
+  --surface-muted: #f7faff;
+  --surface-alt: #eef4ff;
+  --glass: rgba(255, 255, 255, 0.92);
   --border: #e3e9f2;
   --shadow-soft: 0 10px 24px rgba(12, 32, 66, 0.08);
   --shadow: 0 18px 40px rgba(12, 32, 66, 0.14);
-  --radius: 16px;
+  --radius: 18px;
   --mobile-nav-height: 72px;
 }
 
@@ -22,9 +26,10 @@
   box-sizing: border-box;
 }
 
-body {
+body.app {
   font-family: "Plus Jakarta Sans", sans-serif;
-  background: var(--bg);
+  background: radial-gradient(900px 520px at 5% -10%, #e1edff 0%, #f6f8fb 55%, #eef2f7 100%);
+  background-color: var(--bg);
   color: var(--ink);
   min-height: 100vh;
   line-height: 1.6;
@@ -42,11 +47,11 @@ button {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 260px 1fr;
-  background: var(--bg);
+  background: transparent;
 }
 
 .app-sidebar {
-  background: var(--card);
+  background: var(--glass);
   border-right: 1px solid var(--border);
   padding: 22px 18px;
   display: flex;
@@ -55,6 +60,7 @@ button {
   position: sticky;
   top: 0;
   height: 100vh;
+  backdrop-filter: blur(10px);
 }
 
 .brand {
@@ -63,11 +69,7 @@ button {
   gap: 12px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: linear-gradient(
-    135deg,
-    rgba(30, 120, 255, 0.12),
-    rgba(63, 194, 255, 0.12)
-  );
+  background: linear-gradient(135deg, rgba(30, 120, 255, 0.12), rgba(63, 194, 255, 0.12));
 }
 
 .brand-mark {
@@ -96,26 +98,24 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
 }
 
 .nav-item {
-  border: 1px solid transparent;
-  background: #f5f8fd;
-  color: #1c2b4a;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--navy);
   padding: 12px 14px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   text-align: left;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    border-color 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-item:hover {
-  background: #eef4ff;
-  border-color: #d2dded;
+  background: var(--surface-alt);
+  border-color: var(--border);
   transform: translateY(-1px);
 }
 
@@ -130,6 +130,19 @@ button {
   transform: none;
 }
 
+.nav-item.nav-logout {
+  margin-top: auto;
+  background: #fff5f5;
+  color: #b42318;
+  border-color: #f0caca;
+}
+
+.nav-item.nav-logout:hover {
+  background: #ffecec;
+  border-color: #f3b4b4;
+}
+
+
 .app-main {
   padding: 26px 30px 40px;
   position: relative;
@@ -138,11 +151,11 @@ button {
 }
 
 .app-topbar {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, #0b2e4f, #1e78ff);
+  border: 1px solid rgba(11, 46, 79, 0.2);
   border-radius: var(--radius);
   padding: 20px 24px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -157,7 +170,7 @@ button {
 
 .app-topbar h2 {
   font-size: 22px;
-  color: var(--navy);
+  color: #ffffff;
   margin-bottom: 6px;
 }
 
@@ -167,12 +180,12 @@ button {
   flex-wrap: wrap;
   gap: 6px;
   font-size: 12.5px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .topbar-time {
   font-size: 12.5px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .topbar-actions {
@@ -181,22 +194,12 @@ button {
   gap: 12px;
 }
 
-.topbar-btn {
-  border: 1px solid #f0caca;
-  background: #fff5f5;
-  color: #b42318;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 600;
-}
-
 .dot {
   opacity: 0.6;
 }
 
 .app-content {
-  margin-top: 22px;
+  margin-top: 28px;
   display: grid;
   gap: 22px;
 }
@@ -243,7 +246,7 @@ button {
 
 .card,
 .summary-card {
-  background: linear-gradient(180deg, #ffffff, #f7faff);
+  background: var(--surface);
   padding: 16px 18px;
   border-radius: 14px;
   border: 1px solid var(--border);
@@ -277,11 +280,22 @@ table {
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--surface);
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+  width: max-content;
+  min-width: 100%;
 }
 
 thead {
-  background: #f1f6ff;
+  background: var(--surface-alt);
 }
 
 th,
@@ -300,7 +314,7 @@ th {
 }
 
 tbody tr:nth-child(even) {
-  background: #f8fbff;
+  background: var(--surface-muted);
 }
 
 tbody tr:last-child td {
@@ -308,7 +322,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #eef6ff;
+  background: var(--surface-alt);
 }
 
 .empty-state {
@@ -332,19 +346,16 @@ tbody tr:hover {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #f7faff;
+  background: var(--surface-muted);
   font-size: 13.5px;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .form input:focus,
 .form select:focus {
   outline: none;
   border-color: var(--blue);
-  background: #ffffff;
+  background: var(--surface);
   box-shadow: 0 0 0 3px rgba(30, 120, 255, 0.16);
 }
 
@@ -440,18 +451,10 @@ tbody tr:hover {
 }
 
 @keyframes dots {
-  0% {
-    content: "Loading";
-  }
-  33% {
-    content: "Loading.";
-  }
-  66% {
-    content: "Loading..";
-  }
-  100% {
-    content: "Loading...";
-  }
+  0% { content: "Loading"; }
+  33% { content: "Loading."; }
+  66% { content: "Loading.."; }
+  100% { content: "Loading..."; }
 }
 
 /* =========================
@@ -484,7 +487,7 @@ tbody tr:hover {
     justify-content: center;
     gap: 0;
     z-index: 1000;
-    background: var(--card);
+    background: var(--glass);
     box-shadow: 0 -10px 24px rgba(12, 32, 66, 0.08);
   }
 
@@ -508,11 +511,16 @@ tbody tr:hover {
     font-size: 11px;
     text-align: center;
     border-radius: 999px;
-    background: #f3f7ff;
+    background: var(--surface);
+    border: 1px solid var(--border);
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .nav-item.nav-logout {
+    margin-top: 0;
   }
 
   .app-main {
@@ -531,20 +539,8 @@ tbody tr:hover {
     justify-content: space-between;
   }
 
-  .topbar-btn {
-    padding: 8px 12px;
-    font-size: 11.5px;
-  }
-
   .profile-row {
     grid-template-columns: 1fr;
-  }
-
-  table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   th,

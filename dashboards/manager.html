@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="/css/common.css" />
-  <link rel="stylesheet" href="/css/manager.css" />
 </head>
 
 <body class="app">
@@ -25,6 +24,7 @@
         <button class="nav-item" data-section="dashboard" onclick="showSection('dashboard')">Summary</button>
         <button class="nav-item" data-section="employees" onclick="openEmployees()">Employees</button>
         <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+        <button class="nav-item nav-logout" onclick="logout()">Logout</button>
       </nav>
     </aside>
 
@@ -33,12 +33,15 @@
         <div>
           <h2 id="welcomeText">Welcome</h2>
           <div class="topbar-meta">
-            <span id="branchInfo">Branch: —</span>
+            <span id="branchName">Branch</span>
+            <span class="dot">.</span>
+            <span id="branchId">Branch ID: </span>
+            <span class="dot">.</span>
+            <span id="branchAddress">.</span>
           </div>
         </div>
         <div class="topbar-actions">
           <span class="topbar-time" id="welcomeTime"></span>
-          <button class="topbar-btn" onclick="logout()">Logout</button>
         </div>
       </header>
 
@@ -80,19 +83,21 @@
             <p class="section-sub">Active employee roster</p>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>USER ID</th>
-                <th>EMPLOYEE ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Phone</th>
-              </tr>
-            </thead>
-            <tbody id="employeeTable"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>USER ID</th>
+                  <th>EMPLOYEE ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Phone</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTable"></tbody>
+            </table>
+          </div>
         </section>
 
         <!-- CUSTOMERS -->
@@ -102,17 +107,19 @@
             <p class="section-sub">Customer list for this branch</p>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-              </tr>
-            </thead>
-            <tbody id="customerTable"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                </tr>
+              </thead>
+              <tbody id="customerTable"></tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>

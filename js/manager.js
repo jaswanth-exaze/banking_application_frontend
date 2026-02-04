@@ -1,5 +1,3 @@
-console.log("manager.js loaded");
-
 /* SECTION TOGGLER */
 function showSection(id) {
   document.querySelectorAll(".section").forEach(sec =>
@@ -27,14 +25,25 @@ async function loadManagerDashboard() {
   showSection("dashboard");
 
   const token = localStorage.getItem("token");
-  const payload = JSON.parse(atob(token.split(".")[1]));
+  let branchIdFromToken = "—";
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    branchIdFromToken = payload.branch_id ?? branchIdFromToken;
+  } catch (err) {
+    console.warn("Failed to read branch id from token", err);
+  }
 
   /* Welcome + Branch */
   document.getElementById("welcomeText").innerText =
     "Welcome Branch Manager";
 
-  document.getElementById("branchInfo").innerText =
-    `Branch ID: ${payload.branch_id}`;
+  document.getElementById("branchName").innerText = "Branch —";
+  document.getElementById("branchId").innerText =
+    `Branch ID: ${branchIdFromToken}`;
+  document.getElementById("branchAddress").innerText = "—";
+
+  updateDateTime();
+  setInterval(updateDateTime, 60000);
 
   /* Fetch dashboard summary */
   try {
@@ -48,6 +57,23 @@ async function loadManagerDashboard() {
     );
 
     const data = await res.json();
+
+    if (data.branch_name) {
+      const branchLabel = data.branch_code
+        ? `${data.branch_name} Branch • ${data.branch_code}`
+        : `${data.branch_name} Branch`;
+      document.getElementById("branchName").innerText = branchLabel;
+    }
+
+    if (data.branch_id) {
+      document.getElementById("branchId").innerText =
+        `Branch ID: ${data.branch_id}`;
+    }
+
+    if (data.branch_address) {
+      document.getElementById("branchAddress").innerText =
+        data.branch_address;
+    }
 
     document.getElementById("empCount").innerText =
       data.total_employees;
@@ -63,6 +89,28 @@ async function loadManagerDashboard() {
 
   } catch (err) {
     console.error("Dashboard load error", err);
+  }
+}
+
+/* DATE & TIME */
+function updateDateTime() {
+  const now = new Date();
+
+  const date = now.toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  const time = now.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const timeEl = document.getElementById("welcomeTime");
+  if (timeEl) {
+    timeEl.innerText = `${date} • ${time}`;
   }
 }
 
