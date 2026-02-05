@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <title>Customer Dashboard</title>
@@ -24,6 +23,7 @@
 
       <nav class="nav">
         <button class="nav-item" data-section="accounts" onclick="openAccounts()">Accounts</button>
+        <button class="nav-item" data-section="transfer" onclick="openTransfer()">Transfer</button>
         <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
         <button class="nav-item" data-section="profile" onclick="openProfile()">Profile</button>
         <button class="nav-item nav-logout" onclick="logout()">Logout</button>
@@ -42,7 +42,7 @@
         </div>
         <div class="topbar-actions">
           <span class="topbar-time" id="welcomeTime"></span>
-
+        </div>
       </header>
 
       <main class="app-content">
@@ -55,24 +55,69 @@
           <div id="accountsContainer" class="cards"></div>
         </section>
 
-        <!-- TRANSACTIONS -->
-        <section id="transactionsSection" class="section hidden">
+        <!-- TRANSFER -->
+        <section id="transferSection" class="section hidden">
           <div class="section-head">
-            <h3>My Transactions</h3>
-            <p class="section-sub">Latest account activity</p>
+            <h3>Transfer Money</h3>
+            <p class="section-sub">Move funds to another SecureBank account</p>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody id="txnTable"></tbody>
-          </table>
+          <form id="transferForm" class="form">
+            <div class="form-row">
+              <label class="label" for="fromAccount">From Account</label>
+              <select id="fromAccount" required>
+                <option value="">Select one of your accounts</option>
+              </select>
+              <p id="balanceHint" class="helper-text">Pick an account to view available balance.</p>
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="toAccount">Recipient Account ID</label>
+              <input id="toAccount" type="number" placeholder="Enter recipient account ID" required />
+              <p class="helper-text">Use the internal account ID shared by the recipient.</p>
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="transferAmount">Amount</label>
+              <input id="transferAmount" type="number" min="1" step="0.01" placeholder="Enter amount" required />
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="transferDesc">Description (optional)</label>
+              <input id="transferDesc" type="text" maxlength="80" placeholder="Reason or note for this transfer" />
+            </div>
+
+            <button type="submit">Send Money</button>
+            <p id="transferMsg" class="helper-text"></p>
+          </form>
+        </section>
+
+        <!-- TRANSACTIONS -->
+        <section id="transactionsSection" class="section hidden">
+          <div class="section-head section-head--split">
+            <div>
+              <h3>My Transactions</h3>
+              <p class="section-sub">Latest account activity</p>
+            </div>
+            <div class="balance-chip" id="currentBalanceChip">Balance: ₹ &mdash;</div>
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>Description</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Balance After</th>
+                </tr>
+              </thead>
+              <tbody id="txnTable"></tbody>
+            </table>
+          </div>
         </section>
 
         <!-- PROFILE -->
@@ -130,5 +175,4 @@
   </script>
 
 </body>
-
 </html>

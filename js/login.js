@@ -30,3 +30,17 @@ async function login() {
   else
     window.location.href = "../dashboards/manager.html";
 }
+
+
+(function showSessionExpiredMessage() {
+  const msgText = localStorage.getItem("sessionExpiredMessage");
+  if (!msgText) return;
+
+  const msg = document.getElementById("loginMsg");
+  if (msg) {
+    msg.style.color = "#b45309";
+    msg.innerText = msgText;
+  }
+
+  localStorage.removeItem("sessionExpiredMessage");
+})();
