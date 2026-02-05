@@ -25,6 +25,7 @@
       <nav class="nav">
         <button class="nav-item" data-section="dashboard" onclick="showSection('dashboardSection')">Summary</button>
         <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+        <button class="nav-item" data-section="cash" onclick="openCashDesk()">Cash Desk</button>
         <button class="nav-item" data-section="onboard" onclick="showSection('onboardSection')">Onboard</button>
         <button class="nav-item" data-section="profile" onclick="showSection('profileSection')">Profile</button>
         <button class="nav-item nav-logout" id="logoutBtn">Logout</button>
@@ -91,6 +92,81 @@
               </tr>
             </tbody>
           </table>
+        </section>
+
+
+        <!-- CASH DESK -->
+        <section id="cashSection" class="section hidden">
+          <div class="section-head">
+            <h3>Cash Desk</h3>
+            <p class="section-sub">Deposit or withdraw funds on behalf of customers</p>
+          </div>
+
+          <div class="cash-grid">
+            <div class="cash-card">
+              <div class="cash-card-head">
+                <div>
+                  <p class="label">Manual Credit</p>
+                  <h4>Deposit to Account</h4>
+                </div>
+                <span class="pill pill-success">Deposit</span>
+              </div>
+
+              <form id="depositForm" class="form compact">
+                <div class="form-row">
+                  <label class="label" for="depositAccountId">Account ID</label>
+                  <input id="depositAccountId" type="number" min="1" placeholder="e.g. 42" required />
+                  <p class="helper-text">Internal account_id; visible in backend or customer details.</p>
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="depositAmount">Amount (INR)</label>
+                  <input id="depositAmount" type="number" min="1" step="0.01" placeholder="Enter amount to credit"
+                    required />
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="depositDesc">Description (optional)</label>
+                  <input id="depositDesc" type="text" maxlength="80" placeholder="Cash deposit at counter" />
+                </div>
+
+                <button type="submit">Deposit Money</button>
+                <p id="depositMsg" class="helper-text"></p>
+              </form>
+            </div>
+
+            <div class="cash-card">
+              <div class="cash-card-head">
+                <div>
+                  <p class="label">Manual Debit</p>
+                  <h4>Withdraw from Account</h4>
+                </div>
+                <span class="pill pill-danger">Withdraw</span>
+              </div>
+
+              <form id="withdrawForm" class="form compact">
+                <div class="form-row">
+                  <label class="label" for="withdrawAccountId">Account ID</label>
+                  <input id="withdrawAccountId" type="number" min="1" placeholder="e.g. 42" required />
+                  <p class="helper-text">Internal account_id; confirm customer identity before debiting.</p>
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="withdrawAmount">Amount (INR)</label>
+                  <input id="withdrawAmount" type="number" min="1" step="0.01" placeholder="Enter amount to debit"
+                    required />
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="withdrawDesc">Description (optional)</label>
+                  <input id="withdrawDesc" type="text" maxlength="80" placeholder="Cash payout at counter" />
+                </div>
+
+                <button type="submit">Withdraw Money</button>
+                <p id="withdrawMsg" class="helper-text"></p>
+              </form>
+            </div>
+          </div>
         </section>
 
         <!-- ONBOARD CUSTOMER -->
@@ -184,7 +260,7 @@
   </div>
 
   <script src="/js/config.js"></script>
-    <script src="/js/auth.js"></script>
+  <script src="/js/auth.js"></script>
   <script src="/js/employee.js"></script>
 
   <script>

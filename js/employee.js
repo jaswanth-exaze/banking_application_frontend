@@ -185,6 +185,126 @@ async function openCustomers() {
   }
 }
 
+
+/* =========================================================
+   CASH DESK (DEPOSIT & WITHDRAWAL)
+========================================================= */
+
+function setCashStatus(targetId, message, state) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  el.classList.remove("status-error", "status-success");
+  el.innerText = message || "";
+
+  if (state === "error") el.classList.add("status-error");
+  if (state === "success") el.classList.add("status-success");
+}
+
+function openCashDesk() {
+  showSection("cashSection");
+  setCashStatus("depositMsg", "");
+  setCashStatus("withdrawMsg", "");
+}
+
+async function submitDeposit(e) {
+  e.preventDefault();
+
+  const accountId = Number(document.getElementById("depositAccountId").value);
+  const amount = Number(document.getElementById("depositAmount").value);
+  const desc = document.getElementById("depositDesc").value.trim();
+
+  if (!accountId || accountId <= 0 || !amount || amount <= 0) {
+    setCashStatus("depositMsg", "Enter a valid account ID and amount.", "error");
+    return;
+  }
+
+  setCashStatus("depositMsg", "Processing deposit...");
+
+  try {
+    const res = await fetch(getApiUrl("employee/deposite"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({
+        toId: accountId,
+        amount,
+        desc: desc || "Cash deposit",
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Deposit failed");
+
+    setCashStatus(
+      "depositMsg",
+      data.message || "Amount deposited successfully",
+      "success",
+    );
+    e.target.reset();
+  } catch (err) {
+    setCashStatus(
+      "depositMsg",
+      err.message || "Failed to deposit amount",
+      "error",
+    );
+  }
+}
+
+async function submitWithdrawal(e) {
+  e.preventDefault();
+
+  const accountId = Number(
+    document.getElementById("withdrawAccountId").value,
+  );
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const desc = document.getElementById("withdrawDesc").value.trim();
+
+  if (!accountId || accountId <= 0 || !amount || amount <= 0) {
+    setCashStatus(
+      "withdrawMsg",
+      "Enter a valid account ID and amount.",
+      "error",
+    );
+    return;
+  }
+
+  setCashStatus("withdrawMsg", "Processing withdrawal...");
+
+  try {
+    const res = await fetch(getApiUrl("employee/withdrawl"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({
+        fromId: accountId,
+        amount,
+        desc: desc || "Cash withdrawal",
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Withdrawal failed");
+
+    setCashStatus(
+      "withdrawMsg",
+      data.message || "Amount withdrawn successfully",
+      "success",
+    );
+    e.target.reset();
+  } catch (err) {
+    setCashStatus(
+      "withdrawMsg",
+      err.message || "Failed to withdraw amount",
+      "error",
+    );
+  }
+}
+
 /* =========================================================
    PROFILE OPEN
 ========================================================= */
@@ -255,6 +375,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", logoutEmployee);
+  }
+  
+  const depositForm = document.getElementById("depositForm");
+  if (depositForm) {
+    depositForm.addEventListener("submit", submitDeposit);
+  }
+
+  const withdrawForm = document.getElementById("withdrawForm");
+  if (withdrawForm) {
+    withdrawForm.addEventListener("submit", submitWithdrawal);
   }
 });
 
