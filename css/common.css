@@ -741,7 +741,9 @@ tbody tr:hover {
     align-items: center;
     gap: 6px;
   }
-
+.nav::-webkit-scrollbar {
+  display: none; /* Hides the scrollbar visual */
+}
   .nav-item {
     height: 44px;
     width: 100px;
