@@ -28,7 +28,12 @@
 
 body.app {
   font-family: "Plus Jakarta Sans", sans-serif;
-  background: radial-gradient(900px 520px at 5% -10%, #e1edff 0%, #f6f8fb 55%, #eef2f7 100%);
+  background: radial-gradient(
+    900px 520px at 5% -10%,
+    #e1edff 0%,
+    #f6f8fb 55%,
+    #eef2f7 100%
+  );
   background-color: var(--bg);
   color: var(--ink);
   min-height: 100vh;
@@ -69,7 +74,11 @@ button {
   gap: 12px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(30, 120, 255, 0.12), rgba(63, 194, 255, 0.12));
+  background: linear-gradient(
+    135deg,
+    rgba(30, 120, 255, 0.12),
+    rgba(63, 194, 255, 0.12)
+  );
 }
 
 .brand-mark {
@@ -110,7 +119,10 @@ button {
   font-size: 14px;
   font-weight: 600;
   text-align: left;
-  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .nav-item:hover {
@@ -355,7 +367,10 @@ tbody tr:hover {
   border: 1px solid var(--border);
   background: var(--surface-muted);
   font-size: 13.5px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .form input:focus,
@@ -554,7 +569,9 @@ tbody tr:hover {
   color: var(--ink);
   font-weight: 600;
   min-width: 100px;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .pagination-controls button:hover:not(:disabled) {
@@ -662,10 +679,18 @@ tbody tr:hover {
 }
 
 @keyframes dots {
-  0% { content: "Loading"; }
-  33% { content: "Loading."; }
-  66% { content: "Loading.."; }
-  100% { content: "Loading..."; }
+  0% {
+    content: "Loading";
+  }
+  33% {
+    content: "Loading.";
+  }
+  66% {
+    content: "Loading..";
+  }
+  100% {
+    content: "Loading...";
+  }
 }
 
 /* =========================
@@ -707,6 +732,7 @@ tbody tr:hover {
   }
 
   .nav {
+    overflow: auto;
     flex: 1;
     display: grid;
     grid-auto-flow: column;
@@ -718,6 +744,7 @@ tbody tr:hover {
 
   .nav-item {
     height: 44px;
+    width: 100px;
     padding: 0 6px;
     font-size: 11px;
     text-align: center;
