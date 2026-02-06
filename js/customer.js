@@ -326,7 +326,7 @@ async function openTransactions() {
     };
 
     const formatParty = (name, accNumber, id) => {
-      if (!name && !accNumber && !id) return "—";
+      if (!name && !accNumber && !id) return "Cash Desk";
       const label = name || (id ? `Account ${id}` : "Account");
       return `${label}-${last4(accNumber || id)}`;
     };

@@ -25,6 +25,7 @@
       <nav class="nav">
         <button class="nav-item" data-section="dashboard" onclick="showSection('dashboardSection')">Summary</button>
         <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+        <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
         <button class="nav-item" data-section="cash" onclick="openCashDesk()">Cash Desk</button>
         <button class="nav-item" data-section="onboard" onclick="showSection('onboardSection')">Onboard</button>
         <button class="nav-item" data-section="profile" onclick="showSection('profileSection')">Profile</button>
@@ -94,6 +95,54 @@
           </table>
         </section>
 
+        <!-- BRANCH TRANSACTIONS -->
+        <section id="transactionsSection" class="section hidden">
+          <div class="section-head">
+            <h3>Branch Transactions</h3>
+            <p class="section-sub">All movements for accounts under this branch</p>
+          </div>
+
+          <form id="txnFilterForm" class="filters-row">
+            <div class="form-row">
+              <label class="label" for="txnCustomerId">Customer ID</label>
+              <input id="txnCustomerId" type="number" min="1" placeholder="e.g. 42" />
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="txnUserId">User ID</label>
+              <input id="txnUserId" type="number" min="1" placeholder="e.g. 101" />
+            </div>
+
+            <div class="filters-actions">
+              <button type="submit">Search</button>
+              <button type="button" id="txnClearBtn" class="ghost-btn">Clear</button>
+            </div>
+          </form>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="txnTable">
+                <tr><td colspan="6" class="empty-state">Use filters then Search</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-controls">
+            <button type="button" id="txnPrevBtn">Previous</button>
+            <span id="txnPageMeta" class="helper-text">Page 1</span>
+            <button type="button" id="txnNextBtn">Next</button>
+          </div>
+        </section>
 
         <!-- CASH DESK -->
         <section id="cashSection" class="section hidden">

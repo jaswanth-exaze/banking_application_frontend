@@ -8,6 +8,7 @@ function showSection(id) {
     dashboard: "dashboard",
     employees: "employees",
     customers: "customers",
+    transactions: "transactions",
   };
   setActiveNav(map[id] || id);
 }
@@ -204,3 +205,154 @@ async function loadCustomers() {
       `<tr><td colspan="4" class="empty-state">Failed to load customers</td></tr>`;
   }
 }
+
+/* TRANSACTIONS */
+const MGR_TXN_LIMIT = 15;
+let mgrTxnState = { page: 1, total: 0 };
+
+function openTransactions() {
+  showSection("transactions");
+  loadManagerTransactions(1);
+}
+
+function formatParty(name, accountNumber, customerId, userId) {
+  if (!name && !accountNumber && !customerId && !userId) return "—";
+  const trimmed = name ? name.trim() : "";
+  const label = trimmed
+    || (customerId ? `Customer ${customerId}` : userId ? `User ${userId}` : "Account");
+  const suffix = accountNumber && !label.includes(accountNumber) ? ` • ${accountNumber}` : "";
+  return `${label}${suffix}`;
+}
+
+function renderManagerTxns(txns) {
+  const tbody = document.getElementById("mgrTxnTable");
+  if (!tbody) return;
+
+  if (!txns.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No transactions found</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  txns.forEach((t) => {
+    const when = t.created_at
+      ? new Date(t.created_at).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : "—";
+
+    const typeClass = (t.transaction_type || "").toLowerCase() === "credit"
+      ? "txn-credit"
+      : (t.transaction_type || "").toLowerCase() === "debit"
+        ? "txn-debit"
+        : "";
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${when}</td>
+        <td>${formatParty(t.from_customer_name, t.from_account_number, t.from_customer_id, t.from_user_id)}</td>
+        <td>${formatParty(t.to_customer_name, t.to_account_number, t.to_customer_id, t.to_user_id)}</td>
+        <td class="${typeClass}">${t.transaction_type || "—"}</td>
+        <td class="${typeClass}">&#8377; ${Number(t.amount || 0).toLocaleString("en-IN")}</td>
+        <td>${t.description || "—"}</td>
+      </tr>
+    `;
+  });
+}
+
+function updateMgrPager() {
+  const meta = document.getElementById("mgrTxnPageMeta");
+  const prev = document.getElementById("mgrTxnPrevBtn");
+  const next = document.getElementById("mgrTxnNextBtn");
+
+  const totalPages = mgrTxnState.total
+    ? Math.max(1, Math.ceil(mgrTxnState.total / MGR_TXN_LIMIT))
+    : mgrTxnState.page;
+
+  if (meta) meta.innerText = `Page ${mgrTxnState.page}${mgrTxnState.total ? ` / ${totalPages}` : ""}`;
+  if (prev) prev.disabled = mgrTxnState.page <= 1;
+  if (next) next.disabled = mgrTxnState.page >= totalPages;
+}
+
+async function loadManagerTransactions(page = 1) {
+  const tbody = document.getElementById("mgrTxnTable");
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="6" class="loader"></td></tr>`;
+  }
+
+  const customerId = document.getElementById("mgrTxnCustomerId")?.value.trim();
+  const userId = document.getElementById("mgrTxnUserId")?.value.trim();
+
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: MGR_TXN_LIMIT.toString(),
+  });
+  if (customerId) params.append("customerId", customerId);
+  if (userId) params.append("userId", userId);
+
+  try {
+    const res = await fetch(
+      getApiUrl(`manager/transactions?${params.toString()}`),
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } },
+    );
+
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload.message || "Failed to load transactions");
+
+    mgrTxnState = {
+      page: payload.page || page,
+      total: payload.total || 0,
+    };
+
+    renderManagerTxns(payload.data || []);
+    updateMgrPager();
+  } catch (err) {
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">${err.message || "Failed to load transactions"}</td></tr>`;
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const filterForm = document.getElementById("mgrTxnFilterForm");
+  if (filterForm) {
+    filterForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      loadManagerTransactions(1);
+    });
+  }
+
+  const clearBtn = document.getElementById("mgrTxnClearBtn");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      const c = document.getElementById("mgrTxnCustomerId");
+      const u = document.getElementById("mgrTxnUserId");
+      if (c) c.value = "";
+      if (u) u.value = "";
+      loadManagerTransactions(1);
+    });
+  }
+
+  const prevBtn = document.getElementById("mgrTxnPrevBtn");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      if (mgrTxnState.page > 1) loadManagerTransactions(mgrTxnState.page - 1);
+    });
+  }
+
+  const nextBtn = document.getElementById("mgrTxnNextBtn");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      const totalPages = mgrTxnState.total
+        ? Math.ceil(mgrTxnState.total / MGR_TXN_LIMIT)
+        : mgrTxnState.page + 1;
+      if (mgrTxnState.page < totalPages) {
+        loadManagerTransactions(mgrTxnState.page + 1);
+      }
+    });
+  }
+});

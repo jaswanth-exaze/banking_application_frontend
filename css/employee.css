@@ -62,26 +62,6 @@
   max-width: none;
 }
 
-.form-row {
-  display: grid;
-  gap: 6px;
-}
-
-.helper-text {
-  font-size: 12.5px;
-  color: var(--muted);
-}
-
-.status-success {
-  color: #0f8a43;
-  font-weight: 600;
-}
-
-.status-error {
-  color: #c0392b;
-  font-weight: 600;
-}
-
 @media (min-width: 900px) {
   .form {
     grid-template-columns: repeat(1, minmax(0, 1fr));

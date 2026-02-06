@@ -14,6 +14,8 @@ function showSection(sectionId) {
   const map = {
     dashboardSection: "dashboard",
     customersSection: "customers",
+    transactionsSection: "transactions",
+    cashSection: "cash",
     onboardSection: "onboard",
     profileSection: "profile",
   };
@@ -185,6 +187,117 @@ async function openCustomers() {
   }
 }
 
+/* =========================================================
+   TRANSACTIONS (BRANCH LEVEL)
+========================================================= */
+const TXN_PAGE_SIZE = 15;
+let txnState = { page: 1, total: 0 };
+
+function openTransactions() {
+  showSection("transactionsSection");
+  loadTransactions(1);
+}
+
+function formatParty(name, accountNumber, customerId, userId) {
+  if (!name && !accountNumber && !customerId && !userId) return "—";
+  const trimmed = name ? name.trim() : "";
+  const label = trimmed
+    || (customerId ? `Customer ${customerId}` : userId ? `User ${userId}` : "Account");
+  const suffix = accountNumber && !label.includes(accountNumber) ? ` • ${accountNumber}` : "";
+  return `${label}${suffix}`;
+}
+
+function renderTransactions(txns) {
+  const tbody = document.getElementById("txnTable");
+  if (!tbody) return;
+
+  if (!txns.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No transactions found</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  txns.forEach((t) => {
+    const when = t.created_at
+      ? new Date(t.created_at).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : "—";
+
+    const typeClass = (t.transaction_type || "").toLowerCase() === "credit"
+      ? "txn-credit"
+      : (t.transaction_type || "").toLowerCase() === "debit"
+        ? "txn-debit"
+        : "";
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${when}</td>
+        <td>${formatParty(t.from_customer_name, t.from_account_number, t.from_customer_id, t.from_user_id)}</td>
+        <td>${formatParty(t.to_customer_name, t.to_account_number, t.to_customer_id, t.to_user_id)}</td>
+        <td class="${typeClass}">${t.transaction_type || "—"}</td>
+        <td class="${typeClass}">&#8377; ${Number(t.amount || 0).toLocaleString("en-IN")}</td>
+        <td>${t.description || "—"}</td>
+      </tr>
+    `;
+  });
+}
+
+function updateTxnPager() {
+  const meta = document.getElementById("txnPageMeta");
+  const prev = document.getElementById("txnPrevBtn");
+  const next = document.getElementById("txnNextBtn");
+
+  const totalPages = txnState.total
+    ? Math.max(1, Math.ceil(txnState.total / TXN_PAGE_SIZE))
+    : txnState.page;
+
+  if (meta) meta.innerText = `Page ${txnState.page}${txnState.total ? ` / ${totalPages}` : ""}`;
+  if (prev) prev.disabled = txnState.page <= 1;
+  if (next) next.disabled = txnState.page >= totalPages;
+}
+
+async function loadTransactions(page = 1) {
+  const tbody = document.getElementById("txnTable");
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="6" class="loader"></td></tr>`;
+  }
+
+  const customerId = document.getElementById("txnCustomerId")?.value.trim();
+  const userId = document.getElementById("txnUserId")?.value.trim();
+
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: TXN_PAGE_SIZE.toString(),
+  });
+  if (customerId) params.append("customerId", customerId);
+  if (userId) params.append("userId", userId);
+
+  try {
+    const res = await fetch(getApiUrl(`employee/transactions?${params.toString()}`), {
+      headers: getAuthHeader(),
+    });
+
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload.message || "Failed to load transactions");
+console.log(payload)
+    txnState = {
+      page: payload.page || page,
+      total: payload.total || 0,
+    };
+
+    renderTransactions(payload.data || []);
+    updateTxnPager();
+  } catch (err) {
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">${err.message || "Failed to load transactions"}</td></tr>`;
+    }
+  }
+}
 
 /* =========================================================
    CASH DESK (DEPOSIT & WITHDRAWAL)
@@ -376,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", logoutEmployee);
   }
-  
+
   const depositForm = document.getElementById("depositForm");
   if (depositForm) {
     depositForm.addEventListener("submit", submitDeposit);
@@ -385,6 +498,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const withdrawForm = document.getElementById("withdrawForm");
   if (withdrawForm) {
     withdrawForm.addEventListener("submit", submitWithdrawal);
+  }
+
+  const txnFilterForm = document.getElementById("txnFilterForm");
+  if (txnFilterForm) {
+    txnFilterForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      loadTransactions(1);
+    });
+  }
+
+  const txnClearBtn = document.getElementById("txnClearBtn");
+  if (txnClearBtn) {
+    txnClearBtn.addEventListener("click", () => {
+      const custInput = document.getElementById("txnCustomerId");
+      const userInput = document.getElementById("txnUserId");
+      if (custInput) custInput.value = "";
+      if (userInput) userInput.value = "";
+      loadTransactions(1);
+    });
+  }
+
+  const txnPrevBtn = document.getElementById("txnPrevBtn");
+  if (txnPrevBtn) {
+    txnPrevBtn.addEventListener("click", () => {
+      if (txnState.page > 1) {
+        loadTransactions(txnState.page - 1);
+      }
+    });
+  }
+
+  const txnNextBtn = document.getElementById("txnNextBtn");
+  if (txnNextBtn) {
+    txnNextBtn.addEventListener("click", () => {
+      const totalPages = txnState.total
+        ? Math.ceil(txnState.total / TXN_PAGE_SIZE)
+        : txnState.page + 1;
+      if (txnState.page < totalPages) {
+        loadTransactions(txnState.page + 1);
+      }
+    });
   }
 });
 

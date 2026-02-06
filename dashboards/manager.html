@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Manager Dashboard</title>
@@ -24,6 +25,7 @@
         <button class="nav-item" data-section="dashboard" onclick="showSection('dashboard')">Summary</button>
         <button class="nav-item" data-section="employees" onclick="openEmployees()">Employees</button>
         <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+        <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
         <button class="nav-item nav-logout" onclick="logout()">Logout</button>
       </nav>
     </aside>
@@ -121,6 +123,57 @@
             </table>
           </div>
         </section>
+
+        <!-- TRANSACTIONS -->
+        <section id="transactions" class="section hidden">
+          <div class="section-head">
+            <h3>Branch Transactions</h3>
+            <p class="section-sub">Descending by time with quick filters</p>
+          </div>
+
+          <form id="mgrTxnFilterForm" class="filters-row">
+            <div class="form-row">
+              <label class="label" for="mgrTxnCustomerId">Customer ID</label>
+              <input id="mgrTxnCustomerId" type="number" min="1" placeholder="e.g. 42" />
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="mgrTxnUserId">User ID</label>
+              <input id="mgrTxnUserId" type="number" min="1" placeholder="e.g. 101" />
+            </div>
+
+            <div class="filters-actions">
+              <button type="submit">Search</button>
+              <button type="button" id="mgrTxnClearBtn" class="ghost-btn">Clear</button>
+            </div>
+          </form>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="mgrTxnTable">
+                <tr>
+                  <td colspan="6" class="empty-state">Use filters then Search</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-controls">
+            <button type="button" id="mgrTxnPrevBtn">Previous</button>
+            <span id="mgrTxnPageMeta" class="helper-text">Page 1</span>
+            <button type="button" id="mgrTxnNextBtn">Next</button>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -135,4 +188,5 @@
   </script>
 
 </body>
+
 </html>
