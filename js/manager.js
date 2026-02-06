@@ -1,8 +1,8 @@
 /* SECTION TOGGLER */
 function showSection(id) {
-  document.querySelectorAll(".section").forEach(sec =>
-    sec.classList.add("hidden")
-  );
+  document
+    .querySelectorAll(".section")
+    .forEach((sec) => sec.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
   const map = {
     dashboard: "dashboard",
@@ -36,8 +36,7 @@ async function loadManagerDashboard() {
   }
 
   /* Welcome + Branch */
-  document.getElementById("welcomeText").innerText =
-    "Welcome Branch Manager";
+  document.getElementById("welcomeText").innerText = "Welcome Branch Manager";
 
   document.getElementById("branchName").innerText = "Branch —";
   document.getElementById("branchId").innerText =
@@ -49,14 +48,11 @@ async function loadManagerDashboard() {
 
   /* Fetch dashboard summary */
   try {
-    const res = await fetch(
-      getApiUrl("manager/dashboard-summary"),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const res = await fetch(getApiUrl("manager/dashboard-summary"), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     const data = await res.json();
 
@@ -73,22 +69,17 @@ async function loadManagerDashboard() {
     }
 
     if (data.branch_address) {
-      document.getElementById("branchAddress").innerText =
-        data.branch_address;
+      document.getElementById("branchAddress").innerText = data.branch_address;
     }
 
-    document.getElementById("empCount").innerText =
-      data.total_employees;
+    document.getElementById("empCount").innerText = data.total_employees;
 
-    document.getElementById("custCount").innerText =
-      data.total_customers;
+    document.getElementById("custCount").innerText = data.total_customers;
 
-    document.getElementById("accCount").innerText =
-      data.total_accounts;
+    document.getElementById("accCount").innerText = data.total_accounts;
 
     document.getElementById("branchBalance").innerText =
       `₹ ${Number(data.branch_balance).toLocaleString("en-IN")}`;
-
   } catch (err) {
     console.error("Dashboard load error", err);
   }
@@ -129,21 +120,19 @@ async function loadEmployees() {
   tbody.innerHTML = `<tr><td colspan="4" class="loader"></td></tr>`;
 
   try {
-    const res = await fetch(
-      getApiUrl("manager/employees"),
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const res = await fetch(getApiUrl("manager/employees"), {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     const employees = await res.json();
     tbody.innerHTML = "";
 
     if (employees.length === 0) {
-      tbody.innerHTML =
-        `<tr><td colspan="4" class="empty-state">No employees found</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No employees found</td></tr>`;
       return;
     }
 
-    employees.forEach(e => {
+    employees.forEach((e) => {
       const fullName = `${e.first_name || ""} ${e.last_name || ""}`.trim();
       tbody.innerHTML += `
         <tr>
@@ -156,10 +145,8 @@ async function loadEmployees() {
         </tr>
       `;
     });
-
   } catch (err) {
-    tbody.innerHTML =
-      `<tr><td colspan="4" class="empty-state">Failed to load employees</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Failed to load employees</td></tr>`;
   }
 }
 
@@ -176,21 +163,19 @@ async function loadCustomers() {
   tbody.innerHTML = `<tr><td colspan="4" class="loader"></td></tr>`;
 
   try {
-    const res = await fetch(
-      getApiUrl("manager/customers"),
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const res = await fetch(getApiUrl("manager/customers"), {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     const customers = await res.json();
     tbody.innerHTML = "";
 
     if (customers.length === 0) {
-      tbody.innerHTML =
-        `<tr><td colspan="4" class="empty-state">No customers found</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No customers found</td></tr>`;
       return;
     }
 
-    customers.forEach(c => {
+    customers.forEach((c) => {
       tbody.innerHTML += `
         <tr>
           <td>${c.customer_id}</td>
@@ -200,10 +185,8 @@ async function loadCustomers() {
         </tr>
       `;
     });
-
   } catch (err) {
-    tbody.innerHTML =
-      `<tr><td colspan="4" class="empty-state">Failed to load customers</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Failed to load customers</td></tr>`;
   }
 }
 
@@ -219,9 +202,17 @@ function openTransactions() {
 function formatParty(name, accountNumber, customerId, userId) {
   if (!name && !accountNumber && !customerId && !userId) return "—";
   const trimmed = name ? name.trim() : "";
-  const label = trimmed
-    || (customerId ? `Customer ${customerId}` : userId ? `User ${userId}` : "Account");
-  const suffix = accountNumber && !label.includes(accountNumber) ? ` • ${accountNumber}` : "";
+  const label =
+    trimmed ||
+    (customerId
+      ? `Customer ${customerId}`
+      : userId
+        ? `User ${userId}`
+        : "Account");
+  const suffix =
+    accountNumber && !label.includes(accountNumber)
+      ? ` • ${accountNumber}`
+      : "";
   return `${label}${suffix}`;
 }
 
@@ -238,19 +229,20 @@ function renderManagerTxns(txns) {
   txns.forEach((t) => {
     const when = t.created_at
       ? new Date(t.created_at).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
       : "—";
 
-    const typeClass = (t.transaction_type || "").toLowerCase() === "credit"
-      ? "txn-credit"
-      : (t.transaction_type || "").toLowerCase() === "debit"
-        ? "txn-debit"
-        : "";
+    const typeClass =
+      (t.transaction_type || "").toLowerCase() === "credit"
+        ? "txn-credit"
+        : (t.transaction_type || "").toLowerCase() === "debit"
+          ? "txn-debit"
+          : "";
 
     tbody.innerHTML += `
       <tr>
@@ -274,7 +266,8 @@ function updateMgrPager() {
     ? Math.max(1, Math.ceil(mgrTxnState.total / MGR_TXN_LIMIT))
     : mgrTxnState.page;
 
-  if (meta) meta.innerText = `Page ${mgrTxnState.page}${mgrTxnState.total ? ` / ${totalPages}` : ""}`;
+  if (meta)
+    meta.innerText = `Page ${mgrTxnState.page}${mgrTxnState.total ? ` / ${totalPages}` : ""}`;
   if (prev) prev.disabled = mgrTxnState.page <= 1;
   if (next) next.disabled = mgrTxnState.page >= totalPages;
 }
@@ -302,7 +295,8 @@ async function loadManagerTransactions(page = 1) {
     );
 
     const payload = await res.json();
-    if (!res.ok) throw new Error(payload.message || "Failed to load transactions");
+    if (!res.ok)
+      throw new Error(payload.message || "Failed to load transactions");
 
     mgrTxnState = {
       page: payload.page || page,
@@ -367,6 +361,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+const LOAN_STATUS_META = {
+  REQUESTED: { label: "Pending employee review", cls: "waiting" },
+  EMPLOYEE_APPROVED: { label: "Awaiting manager decision", cls: "info" },
+  EMPLOYEE_REJECTED: { label: "Rejected by employee", cls: "danger" },
+  MANAGER_APPROVED: { label: "Approved", cls: "success" },
+  MANAGER_REJECTED: { label: "Rejected by manager", cls: "danger" },
+};
+
+function formatLoanStatus(status) {
+  const meta = LOAN_STATUS_META[status] || {
+    label: status || "—",
+    cls: "info",
+  };
+  return `<span class="loan-status ${meta.cls}">${meta.label}</span>`;
+}
 /* LOANS */
 function setManagerLoanMsg(text, state) {
   const el = document.getElementById("mgrLoanMsg");
@@ -380,6 +389,7 @@ function setManagerLoanMsg(text, state) {
 function openManagerLoans() {
   showSection("loans");
   loadManagerLoans();
+  loadAllManagerLoans();
 }
 
 function renderManagerLoans(loans = []) {
@@ -387,8 +397,7 @@ function renderManagerLoans(loans = []) {
   if (!tbody) return;
 
   if (!loans.length) {
-    tbody.innerHTML =
-      `<tr><td colspan="8" class="empty-state">No loans pending manager decision</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No loans pending manager decision</td></tr>`;
     return;
   }
 
@@ -396,12 +405,12 @@ function renderManagerLoans(loans = []) {
   loans.forEach((loan) => {
     const created = loan.created_at
       ? new Date(loan.created_at).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
       : "—";
 
     tbody.innerHTML += `
@@ -454,8 +463,7 @@ async function loadManagerLoans() {
   } catch (err) {
     setManagerLoanMsg(err.message || "Unable to load loans", "error");
     if (tbody) {
-      tbody.innerHTML =
-        `<tr><td colspan="8" class="empty-state">Could not load loans</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Could not load loans</td></tr>`;
     }
   }
 }
@@ -489,4 +497,70 @@ async function handleManagerLoanDecision(loanId, action) {
   } catch (err) {
     setManagerLoanMsg(err.message || "Unable to update loan", "error");
   }
+}
+
+async function loadAllManagerLoans() {
+  const tbody = document.getElementById("mgrAllLoanTable");
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="7" class="loader"></td></tr>`;
+  }
+
+  try {
+    const res = await fetch(getApiUrl("manager/loans"), {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+
+    const loans = await res.json();
+    if (!res.ok) throw new Error(loans.message || "Failed to load loans");
+
+    renderAllManagerLoans(loans || []);
+  } catch (err) {
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">${err.message || "Unable to load loans"}</td></tr>`;
+    }
+  }
+}
+
+function renderAllManagerLoans(loans = []) {
+  const tbody = document.getElementById("mgrAllLoanTable");
+  if (!tbody) return;
+
+  if (!loans.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No loans found</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  loans.forEach((loan) => {
+    const updated = loan.updated_at
+      ? new Date(loan.updated_at).toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "—";
+
+    const comment =
+      loan.manager_comment ||
+      loan.employee_comment ||
+      (loan.status === "EMPLOYEE_APPROVED" ? "Pending manager decision" : "—");
+
+    const customerName =
+      `${loan.first_name || ""} ${loan.last_name || ""}`.trim() ||
+      `Customer ${loan.customer_id}`;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${loan.loan_id}</td>
+        <td>${customerName} (ID ${loan.customer_id})</td>
+        <td>&#8377; ${Number(loan.amount || 0).toLocaleString("en-IN")}</td>
+        <td>${loan.tenure_months} mo</td>
+        <td>${formatLoanStatus(loan.status)}</td>
+        <td>${updated}</td>
+        <td>${comment}</td>
+      </tr>
+    `;
+  });
 }
