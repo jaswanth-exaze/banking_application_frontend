@@ -25,6 +25,7 @@
         <button class="nav-item" data-section="dashboard" onclick="showSection('dashboard')">Summary</button>
         <button class="nav-item" data-section="employees" onclick="openEmployees()">Employees</button>
         <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
+        <button class="nav-item" data-section="loans" onclick="openManagerLoans()">Loans</button>
         <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
         <button class="nav-item nav-logout" onclick="logout()">Logout</button>
       </nav>
@@ -172,6 +173,39 @@
             <button type="button" id="mgrTxnPrevBtn">Previous</button>
             <span id="mgrTxnPageMeta" class="helper-text">Page 1</span>
             <button type="button" id="mgrTxnNextBtn">Next</button>
+          </div>
+        </section>
+
+
+        <!-- LOANS -->
+        <section id="loans" class="section hidden">
+          <div class="section-head">
+            <h3>Loan Approvals</h3>
+            <p class="section-sub">Employee-approved loans awaiting manager decision</p>
+          </div>
+
+          <p id="mgrLoanMsg" class="helper-text"></p>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loan ID</th>
+                  <th>Customer ID</th>
+                  <th>Amount</th>
+                  <th>Tenure</th>
+                  <th>Purpose</th>
+                  <th>Requested On</th>
+                  <th>Comment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="mgrLoanTable">
+                <tr>
+                  <td colspan="8" class="empty-state">No pending loans</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
       </main>

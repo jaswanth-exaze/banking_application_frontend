@@ -10,6 +10,7 @@ function showSection(id) {
     accountsSection: "accounts",
     transferSection: "transfer",
     transactionsSection: "transactions",
+    loansSection: "loans",
     profileSection: "profile",
   };
   setActiveNav(map[id] || id);
@@ -440,6 +441,143 @@ document.addEventListener("DOMContentLoaded", () => {
   if (fromSelect) {
     fromSelect.addEventListener("change", updateBalanceHint);
   }
+
+  const loanForm = document.getElementById("loanForm");
+  if (loanForm) {
+    loanForm.addEventListener("submit", submitLoanApplication);
+  }
 });
 
 
+/* =========================
+   LOANS
+========================= */
+const LOAN_STATUS_META = {
+  REQUESTED: { label: "Pending employee review", cls: "waiting" },
+  EMPLOYEE_APPROVED: { label: "Awaiting manager decision", cls: "info" },
+  EMPLOYEE_REJECTED: { label: "Rejected by employee", cls: "danger" },
+  MANAGER_APPROVED: { label: "Approved", cls: "success" },
+  MANAGER_REJECTED: { label: "Rejected by manager", cls: "danger" },
+};
+
+function formatLoanStatus(status) {
+  const meta = LOAN_STATUS_META[status] || { label: status || "—", cls: "info" };
+  return `<span class="loan-status ${meta.cls}">${meta.label}</span>`;
+}
+
+function setLoanFormMsg(text, state) {
+  const el = document.getElementById("loanFormMsg");
+  if (!el) return;
+  el.classList.remove("status-success", "status-error");
+  el.innerText = text || "";
+  if (state === "success") el.classList.add("status-success");
+  if (state === "error") el.classList.add("status-error");
+}
+
+async function openLoans() {
+  showSection("loansSection");
+  loadLoans();
+}
+
+async function submitLoanApplication(e) {
+  e.preventDefault();
+
+  const amount = Number(document.getElementById("loanAmount").value);
+  const tenure = Number(document.getElementById("loanTenure").value);
+  const purpose = document.getElementById("loanPurpose").value.trim();
+
+  if (!amount || amount <= 0 || !tenure) {
+    setLoanFormMsg("Please enter a valid amount and tenure.", "error");
+    return;
+  }
+
+  setLoanFormMsg("Submitting loan request...");
+
+  try {
+    const res = await fetch(getApiUrl("customer/applyLoan"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({
+        amount,
+        tenure_months: tenure,
+        purpose: purpose || undefined,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Loan request failed");
+
+    setLoanFormMsg(data.message || "Loan request submitted", "success");
+    e.target.reset();
+    loadLoans();
+  } catch (err) {
+    setLoanFormMsg(err.message || "Unable to submit loan", "error");
+  }
+}
+
+async function loadLoans() {
+  const tbody = document.getElementById("loanTable");
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="7" class="loader"></td></tr>`;
+  }
+
+  try {
+    const res = await fetch(getApiUrl("customer/getLoans"), {
+      headers: getAuthHeader(),
+    });
+    const loans = await res.json();
+    if (!res.ok) throw new Error(loans.message || "Failed to load loans");
+    renderLoans(loans || []);
+  } catch (err) {
+    if (tbody) {
+      tbody.innerHTML =
+        `<tr><td colspan="7" class="empty-state">${err.message || "Unable to load loans"}</td></tr>`;
+    }
+  }
+}
+
+function renderLoans(loans = []) {
+  const tbody = document.getElementById("loanTable");
+  if (!tbody) return;
+
+  if (!loans.length) {
+    tbody.innerHTML =
+      `<tr><td colspan="7" class="empty-state">No loan requests yet</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  loans.forEach((loan) => {
+    const updated = loan.updated_at
+      ? new Date(loan.updated_at).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : "—";
+
+    const comment =
+      loan.manager_comment ||
+      loan.employee_comment ||
+      (loan.status === "EMPLOYEE_APPROVED"
+        ? "Pending manager decision"
+        : "—");
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${loan.loan_id}</td>
+        <td>&#8377; ${Number(loan.amount || 0).toLocaleString("en-IN")}</td>
+        <td>${loan.tenure_months} mo</td>
+        <td>${loan.purpose || "—"}</td>
+        <td>${formatLoanStatus(loan.status)}</td>
+        <td>${updated}</td>
+        <td>${comment}</td>
+      </tr>
+    `;
+  });
+}

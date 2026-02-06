@@ -9,6 +9,7 @@ function showSection(id) {
     employees: "employees",
     customers: "customers",
     transactions: "transactions",
+    loans: "loans",
   };
   setActiveNav(map[id] || id);
 }
@@ -355,4 +356,137 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  const loanTable = document.getElementById("mgrLoanTable");
+  if (loanTable) {
+    loanTable.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      handleManagerLoanDecision(btn.dataset.loanId, btn.dataset.action);
+    });
+  }
 });
+
+/* LOANS */
+function setManagerLoanMsg(text, state) {
+  const el = document.getElementById("mgrLoanMsg");
+  if (!el) return;
+  el.classList.remove("status-success", "status-error");
+  el.innerText = text || "";
+  if (state === "success") el.classList.add("status-success");
+  if (state === "error") el.classList.add("status-error");
+}
+
+function openManagerLoans() {
+  showSection("loans");
+  loadManagerLoans();
+}
+
+function renderManagerLoans(loans = []) {
+  const tbody = document.getElementById("mgrLoanTable");
+  if (!tbody) return;
+
+  if (!loans.length) {
+    tbody.innerHTML =
+      `<tr><td colspan="8" class="empty-state">No loans pending manager decision</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  loans.forEach((loan) => {
+    const created = loan.created_at
+      ? new Date(loan.created_at).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : "—";
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${loan.loan_id}</td>
+        <td>${loan.customer_id}</td>
+        <td>&#8377; ${Number(loan.amount || 0).toLocaleString("en-IN")}</td>
+        <td>${loan.tenure_months} months</td>
+        <td>${loan.purpose || "—"}</td>
+        <td>${created}</td>
+        <td>
+          <input
+            type="text"
+            class="loan-comment"
+            data-loan-id="${loan.loan_id}"
+            placeholder="Optional comment"
+          />
+        </td>
+        <td class="loan-actions">
+          <button type="button" data-loan-id="${loan.loan_id}" data-action="APPROVE">Approve</button>
+          <button type="button" class="ghost-btn danger-btn" data-loan-id="${loan.loan_id}" data-action="REJECT">Reject</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function loadManagerLoans() {
+  const tbody = document.getElementById("mgrLoanTable");
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="8" class="loader"></td></tr>`;
+  }
+  setManagerLoanMsg("Fetching pending loans...");
+
+  try {
+    const res = await fetch(getApiUrl("manager/pendingLoans"), {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+
+    const loans = await res.json();
+    if (!res.ok) throw new Error(loans.message || "Failed to load loans");
+
+    renderManagerLoans(loans || []);
+    setManagerLoanMsg(
+      loans?.length
+        ? `${loans.length} loan${loans.length > 1 ? "s" : ""} awaiting decision`
+        : "All caught up. No pending loans.",
+      loans?.length ? undefined : "success",
+    );
+  } catch (err) {
+    setManagerLoanMsg(err.message || "Unable to load loans", "error");
+    if (tbody) {
+      tbody.innerHTML =
+        `<tr><td colspan="8" class="empty-state">Could not load loans</td></tr>`;
+    }
+  }
+}
+
+async function handleManagerLoanDecision(loanId, action) {
+  if (!loanId || !action) return;
+  const commentInput = document.querySelector(
+    `.loan-comment[data-loan-id="${loanId}"]`,
+  );
+  const comment = commentInput ? commentInput.value.trim() : "";
+
+  setManagerLoanMsg(
+    `${action === "APPROVE" ? "Approving" : "Rejecting"} loan #${loanId}...`,
+  );
+
+  try {
+    const res = await fetch(getApiUrl(`manager/${loanId}/decision`), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ action, comment }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to update loan");
+
+    setManagerLoanMsg(data.message || "Decision saved", "success");
+    loadManagerLoans();
+  } catch (err) {
+    setManagerLoanMsg(err.message || "Unable to update loan", "error");
+  }
+}

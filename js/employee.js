@@ -15,6 +15,7 @@ function showSection(sectionId) {
     dashboardSection: "dashboard",
     customersSection: "customers",
     transactionsSection: "transactions",
+    loansSection: "loans",
     cashSection: "cash",
     onboardSection: "onboard",
     profileSection: "profile",
@@ -539,6 +540,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  const loanTable = document.getElementById("empLoanTable");
+  if (loanTable) {
+    loanTable.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      handleEmployeeLoanDecision(btn.dataset.loanId, btn.dataset.action);
+    });
+  }
 });
 
 function logoutEmployee() {
@@ -551,4 +561,131 @@ function logoutEmployee() {
   // Redirect to login page
   window.location.href = "/login.html";
   // 👆 adjust path if your login page is different
+}
+
+/* =========================================================
+   LOANS QUEUE
+========================================================= */
+function setEmployeeLoanMsg(text, state) {
+  const el = document.getElementById("empLoanMsg");
+  if (!el) return;
+  el.classList.remove("status-success", "status-error");
+  el.innerText = text || "";
+  if (state === "success") el.classList.add("status-success");
+  if (state === "error") el.classList.add("status-error");
+}
+
+function openLoanQueue() {
+  showSection("loansSection");
+  loadEmployeeLoans();
+}
+
+function renderEmployeeLoans(loans = []) {
+  const tbody = document.getElementById("empLoanTable");
+  if (!tbody) return;
+
+  if (!loans.length) {
+    tbody.innerHTML =
+      `<tr><td colspan="8" class="empty-state">No pending loans</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  loans.forEach((loan) => {
+    const created = loan.created_at
+      ? new Date(loan.created_at).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+      : "—";
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${loan.loan_id}</td>
+        <td>${loan.customer_id}</td>
+        <td>&#8377; ${Number(loan.amount || 0).toLocaleString("en-IN")}</td>
+        <td>${loan.tenure_months} months</td>
+        <td>${loan.purpose || "—"}</td>
+        <td>${created}</td>
+        <td>
+          <input
+            type="text"
+            class="loan-comment"
+            data-loan-id="${loan.loan_id}"
+            placeholder="Optional comment"
+          />
+        </td>
+        <td class="loan-actions">
+          <button type="button" data-loan-id="${loan.loan_id}" data-action="APPROVE">Approve</button>
+          <button type="button" class="ghost-btn danger-btn" data-loan-id="${loan.loan_id}" data-action="REJECT">Reject</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function loadEmployeeLoans() {
+  const tbody = document.getElementById("empLoanTable");
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="8" class="loader"></td></tr>`;
+  }
+  setEmployeeLoanMsg("Fetching pending loans...");
+
+  try {
+    const res = await fetch(getApiUrl("employee/pendingLoans"), {
+      headers: getAuthHeader(),
+    });
+
+    const loans = await res.json();
+    if (!res.ok) throw new Error(loans.message || "Failed to load loans");
+
+    renderEmployeeLoans(loans || []);
+    setEmployeeLoanMsg(
+      loans?.length
+        ? `${loans.length} loan${loans.length > 1 ? "s" : ""} waiting for your decision`
+        : "All caught up. No pending loans.",
+      loans?.length ? undefined : "success",
+    );
+  } catch (err) {
+    setEmployeeLoanMsg(err.message || "Unable to load loans", "error");
+    if (tbody) {
+      tbody.innerHTML =
+        `<tr><td colspan="8" class="empty-state">Could not load loans</td></tr>`;
+    }
+  }
+}
+
+async function handleEmployeeLoanDecision(loanId, action) {
+  if (!loanId || !action) return;
+
+  const commentInput = document.querySelector(
+    `.loan-comment[data-loan-id="${loanId}"]`,
+  );
+  const comment = commentInput ? commentInput.value.trim() : "";
+
+  setEmployeeLoanMsg(
+    `${action === "APPROVE" ? "Approving" : "Rejecting"} loan #${loanId}...`,
+  );
+
+  try {
+    const res = await fetch(getApiUrl(`employee/${loanId}/decision`), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({ action, comment }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to update loan");
+
+    setEmployeeLoanMsg(data.message || "Decision saved", "success");
+    loadEmployeeLoans();
+  } catch (err) {
+    setEmployeeLoanMsg(err.message || "Unable to update loan", "error");
+  }
 }

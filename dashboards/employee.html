@@ -26,6 +26,7 @@
         <button class="nav-item" data-section="dashboard" onclick="showSection('dashboardSection')">Summary</button>
         <button class="nav-item" data-section="customers" onclick="openCustomers()">Customers</button>
         <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
+        <button class="nav-item" data-section="loans" onclick="openLoanQueue()">Loans</button>
         <button class="nav-item" data-section="cash" onclick="openCashDesk()">Cash Desk</button>
         <button class="nav-item" data-section="onboard" onclick="showSection('onboardSection')">Onboard</button>
         <button class="nav-item" data-section="profile" onclick="showSection('profileSection')">Profile</button>
@@ -132,7 +133,9 @@
                 </tr>
               </thead>
               <tbody id="txnTable">
-                <tr><td colspan="6" class="empty-state">Use filters then Search</td></tr>
+                <tr>
+                  <td colspan="6" class="empty-state">Use filters then Search</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -141,6 +144,38 @@
             <button type="button" id="txnPrevBtn">Previous</button>
             <span id="txnPageMeta" class="helper-text">Page 1</span>
             <button type="button" id="txnNextBtn">Next</button>
+          </div>
+        </section>
+
+        <!-- LOANS QUEUE -->
+        <section id="loansSection" class="section hidden">
+          <div class="section-head">
+            <h3>Loan Requests</h3>
+            <p class="section-sub">New customer loan requests for your branch</p>
+          </div>
+
+          <p id="empLoanMsg" class="helper-text"></p>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loan ID</th>
+                  <th>Customer ID</th>
+                  <th>Amount</th>
+                  <th>Tenure</th>
+                  <th>Purpose</th>
+                  <th>Requested On</th>
+                  <th>Comment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="empLoanTable">
+                <tr>
+                  <td colspan="8" class="empty-state">No pending loans</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 

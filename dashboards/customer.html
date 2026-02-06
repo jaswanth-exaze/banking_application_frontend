@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Customer Dashboard</title>
@@ -25,6 +26,7 @@
         <button class="nav-item" data-section="accounts" onclick="openAccounts()">Accounts</button>
         <button class="nav-item" data-section="transfer" onclick="openTransfer()">Transfer</button>
         <button class="nav-item" data-section="transactions" onclick="openTransactions()">Transactions</button>
+        <button class="nav-item" data-section="loans" onclick="openLoans()">Loans</button>
         <button class="nav-item" data-section="profile" onclick="openProfile()">Profile</button>
         <button class="nav-item nav-logout" onclick="logout()">Logout</button>
       </nav>
@@ -120,6 +122,71 @@
           </div>
         </section>
 
+
+        <!-- LOANS -->
+        <section id="loansSection" class="section hidden">
+          <div class="section-head">
+            <h3>Loans</h3>
+            <p class="section-sub">Apply for a loan and track its status</p>
+          </div>
+
+          <div class="loan-grid">
+            <div class="loan-card">
+              <h4>Apply for Loan</h4>
+              <form id="loanForm" class="form">
+                <div class="form-row">
+                  <label class="label" for="loanAmount">Amount (INR)</label>
+                  <input id="loanAmount" type="number" min="1000" step="1000" placeholder="e.g. 50000" required />
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="loanTenure">Tenure (months)</label>
+                  <select id="loanTenure" required>
+                    <option value="">Select tenure</option>
+                    <option value="6">6 months</option>
+                    <option value="12">12 months</option>
+                    <option value="24">24 months</option>
+                    <option value="36">36 months</option>
+                    <option value="48">48 months</option>
+                    <option value="60">60 months</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="loanPurpose">Purpose (optional)</label>
+                  <input id="loanPurpose" type="text" maxlength="255" placeholder="Home renovation, education, etc." />
+                </div>
+
+                <button type="submit">Submit Loan Request</button>
+              </form>
+              <p id="loanFormMsg" class="helper-text"></p>
+            </div>
+
+            <div class="loan-card">
+              <h4>My Loan Requests</h4>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Amount</th>
+                      <th>Tenure</th>
+                      <th>Purpose</th>
+                      <th>Status</th>
+                      <th>Updated</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody id="loanTable">
+                    <tr>
+                      <td colspan="7" class="empty-state">No loan requests yet</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
         <!-- PROFILE -->
         <section id="profileSection" class="section hidden">
           <div class="section-head">
@@ -175,4 +242,5 @@
   </script>
 
 </body>
+
 </html>
