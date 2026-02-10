@@ -1,3 +1,8 @@
+/**
+ * Employee dashboard script.
+ * Handles branch operations: onboarding, cash desk, transactions, and loan reviews.
+ */
+
 /* =========================================================
    EMPLOYEE DASHBOARD SCRIPT
    ========================================================= */
@@ -6,6 +11,8 @@
    BASIC HELPERS
 ========================================================= */
 
+// This function hides all sections, shows one requested section,
+// and also updates the active nav item for that section.
 function showSection(sectionId) {
   document.querySelectorAll(".section").forEach((sec) => {
     sec.classList.add("hidden");
@@ -23,6 +30,8 @@ function showSection(sectionId) {
   setActiveNav(map[sectionId] || sectionId);
 }
 
+// This function removes active class from all nav buttons
+// and then enables it only for the selected section key.
 function setActiveNav(key) {
   document.querySelectorAll(".nav-item").forEach((btn) => {
     btn.classList.remove("active");
@@ -31,6 +40,7 @@ function setActiveNav(key) {
   if (target) target.classList.add("active");
 }
 
+// Returns authorization header used in every protected API call.
 function getAuthHeader() {
   return {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -41,6 +51,7 @@ function getAuthHeader() {
    DATE & TIME
 ========================================================= */
 
+// Updates the live date/time text shown on the dashboard header.
 function updateDateTime() {
   const now = new Date();
 
@@ -63,6 +74,8 @@ function updateDateTime() {
    DASHBOARD INITIAL LOAD
 ========================================================= */
 
+// Initial employee dashboard setup:
+// open default section, start clock, and load summary/profile data.
 function initEmployeeDashboard() {
   showSection("dashboardSection");
   updateDateTime();
@@ -76,6 +89,7 @@ function initEmployeeDashboard() {
    EMPLOYEE PROFILE
 ========================================================= */
 
+// Loads employee profile details and fills both greeting + profile panel fields.
 async function loadEmployeeProfile() {
   try {
     const res = await fetch(getApiUrl("employee/profile"), {
@@ -86,7 +100,7 @@ async function loadEmployeeProfile() {
 
     const emp = await res.json();
 
-    /* Greeting */
+    // Choose greeting text based on current local time.
     const hour = new Date().getHours();
     let greeting = "Good Evening";
     if (hour < 12) greeting = "Good Morning";
@@ -123,6 +137,7 @@ async function loadEmployeeProfile() {
    BRANCH SUMMARY
 ========================================================= */
 
+// Fetches branch summary metrics and renders dashboard stat cards.
 async function loadBranchSummary() {
   try {
     const res = await fetch(
@@ -147,6 +162,7 @@ async function loadBranchSummary() {
    VIEW CUSTOMERS
 ========================================================= */
 
+// Opens customer section and renders branch customers in table form.
 async function openCustomers() {
   showSection("customersSection");
 
@@ -192,13 +208,16 @@ async function openCustomers() {
    TRANSACTIONS (BRANCH LEVEL)
 ========================================================= */
 const TXN_PAGE_SIZE = 15;
+// Current pagination state for the branch transaction table.
 let txnState = { page: 1, total: 0 };
 
+// Opens transactions section and loads first page.
 function openTransactions() {
   showSection("transactionsSection");
   loadTransactions(1);
 }
 
+// Builds display label for sender/receiver with safe fallbacks.
 function formatParty(name, accountNumber, customerId, userId) {
   if (!name && !accountNumber && !customerId && !userId) return "—";
   const trimmed = name ? name.trim() : "";
@@ -208,6 +227,7 @@ function formatParty(name, accountNumber, customerId, userId) {
   return `${label}${suffix}`;
 }
 
+// Renders transactions array into table rows.
 function renderTransactions(txns) {
   const tbody = document.getElementById("txnTable");
   if (!tbody) return;
@@ -248,6 +268,7 @@ function renderTransactions(txns) {
   });
 }
 
+// Updates pager text and previous/next button disabled state.
 function updateTxnPager() {
   const meta = document.getElementById("txnPageMeta");
   const prev = document.getElementById("txnPrevBtn");
@@ -262,15 +283,18 @@ function updateTxnPager() {
   if (next) next.disabled = txnState.page >= totalPages;
 }
 
+// Loads transactions with pagination + optional customer/user filters.
 async function loadTransactions(page = 1) {
   const tbody = document.getElementById("txnTable");
   if (tbody) {
     tbody.innerHTML = `<tr><td colspan="6" class="loader"></td></tr>`;
   }
 
+  // Read optional filter values from search inputs.
   const customerId = document.getElementById("txnCustomerId")?.value.trim();
   const userId = document.getElementById("txnUserId")?.value.trim();
 
+  // Build query string sent to backend.
   const params = new URLSearchParams({
     page: page.toString(),
     limit: TXN_PAGE_SIZE.toString(),
@@ -278,6 +302,7 @@ async function loadTransactions(page = 1) {
   if (customerId) params.append("customerId", customerId);
   if (userId) params.append("userId", userId);
 
+  // Fetch branch transactions from API.
   try {
     const res = await fetch(getApiUrl(`employee/transactions?${params.toString()}`), {
       headers: getAuthHeader(),
@@ -304,6 +329,7 @@ console.log(payload)
    CASH DESK (DEPOSIT & WITHDRAWAL)
 ========================================================= */
 
+// Reusable helper to show success/error message in cash desk forms.
 function setCashStatus(targetId, message, state) {
   const el = document.getElementById(targetId);
   if (!el) return;
@@ -315,12 +341,14 @@ function setCashStatus(targetId, message, state) {
   if (state === "success") el.classList.add("status-success");
 }
 
+// Opens cash section and clears stale status messages.
 function openCashDesk() {
   showSection("cashSection");
   setCashStatus("depositMsg", "");
   setCashStatus("withdrawMsg", "");
 }
 
+// Validates and submits cash deposit request.
 async function submitDeposit(e) {
   e.preventDefault();
 
@@ -328,6 +356,7 @@ async function submitDeposit(e) {
   const amount = Number(document.getElementById("depositAmount").value);
   const desc = document.getElementById("depositDesc").value.trim();
 
+  // Client-side validation before sending request.
   if (!accountId || accountId <= 0 || !amount || amount <= 0) {
     setCashStatus("depositMsg", "Enter a valid account ID and amount.", "error");
     return;
@@ -335,6 +364,7 @@ async function submitDeposit(e) {
 
   setCashStatus("depositMsg", "Processing deposit...");
 
+  // Call deposit API endpoint.
   try {
     const res = await fetch(getApiUrl("employee/deposite"), {
       method: "POST",
@@ -367,6 +397,7 @@ async function submitDeposit(e) {
   }
 }
 
+// Validates and submits cash withdrawal request.
 async function submitWithdrawal(e) {
   e.preventDefault();
 
@@ -376,6 +407,7 @@ async function submitWithdrawal(e) {
   const amount = Number(document.getElementById("withdrawAmount").value);
   const desc = document.getElementById("withdrawDesc").value.trim();
 
+  // Client-side validation before sending request.
   if (!accountId || accountId <= 0 || !amount || amount <= 0) {
     setCashStatus(
       "withdrawMsg",
@@ -387,6 +419,7 @@ async function submitWithdrawal(e) {
 
   setCashStatus("withdrawMsg", "Processing withdrawal...");
 
+  // Call withdrawal API endpoint.
   try {
     const res = await fetch(getApiUrl("employee/withdrawl"), {
       method: "POST",
@@ -423,6 +456,7 @@ async function submitWithdrawal(e) {
    PROFILE OPEN
 ========================================================= */
 
+// Opens profile section in the dashboard.
 function openProfile() {
   showSection("profileSection");
 }
@@ -431,11 +465,14 @@ function openProfile() {
    ONBOARD CUSTOMER (MERGED FLOW)
 ========================================================= */
 
+// Handles onboarding form submit:
+// creates customer user + customer profile + optional opening account.
 async function onboardCustomer(e) {
   e.preventDefault();
 
   const msg = document.getElementById("onboardMsg");
 
+  // Construct request payload from onboarding form fields.
   const payload = {
     username: obUsername.value.trim(),
     password: obPassword.value,
@@ -451,6 +488,7 @@ async function onboardCustomer(e) {
   msg.innerText = "Processing...";
   msg.style.color = "#333";
 
+  // Submit onboarding request to backend.
   try {
     const res = await fetch(getApiUrl("employee/onboard-customer"), {
       method: "POST",
@@ -478,6 +516,7 @@ async function onboardCustomer(e) {
    INIT
 ========================================================= */
 
+// Register page event listeners once the DOM is fully loaded.
 document.addEventListener("DOMContentLoaded", () => {
   initEmployeeDashboard();
 
@@ -551,6 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// Clears auth data and redirects employee back to the login screen.
 function logoutEmployee() {
   // Clear auth data
   localStorage.removeItem("token");
@@ -566,6 +606,7 @@ function logoutEmployee() {
 /* =========================================================
    LOANS QUEUE
 ========================================================= */
+// Shows queue-level status messages for loan actions.
 function setEmployeeLoanMsg(text, state) {
   const el = document.getElementById("empLoanMsg");
   if (!el) return;
@@ -575,11 +616,13 @@ function setEmployeeLoanMsg(text, state) {
   if (state === "error") el.classList.add("status-error");
 }
 
+// Opens pending loans section and fetches latest queue.
 function openLoanQueue() {
   showSection("loansSection");
   loadEmployeeLoans();
 }
 
+// Renders pending loans list with inline action buttons.
 function renderEmployeeLoans(loans = []) {
   const tbody = document.getElementById("empLoanTable");
   if (!tbody) return;
@@ -627,6 +670,7 @@ function renderEmployeeLoans(loans = []) {
   });
 }
 
+// Fetches pending loans that need employee decision.
 async function loadEmployeeLoans() {
   const tbody = document.getElementById("empLoanTable");
   if (tbody) {
@@ -658,6 +702,7 @@ async function loadEmployeeLoans() {
   }
 }
 
+// Sends employee approve/reject action for selected loan.
 async function handleEmployeeLoanDecision(loanId, action) {
   if (!loanId || !action) return;
 

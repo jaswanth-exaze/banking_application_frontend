@@ -1,6 +1,13 @@
+/**
+ * Customer dashboard script.
+ * Manages section navigation, profile/account data, transfers, transactions, and loans.
+ */
+
 /* =========================
    SECTION HANDLER
 ========================= */
+// This function hides all dashboard sections, shows only the requested section,
+// and then updates which nav button should look active.
 function showSection(id) {
   document.querySelectorAll(".section").forEach((section) => {
     section.classList.add("hidden");
@@ -16,6 +23,8 @@ function showSection(id) {
   setActiveNav(map[id] || id);
 }
 
+// This function removes the active state from all nav buttons,
+// then marks only the requested nav key as active.
 function setActiveNav(key) {
   document.querySelectorAll(".nav-item").forEach((btn) => {
     btn.classList.remove("active");
@@ -27,14 +36,18 @@ function setActiveNav(key) {
 /* =========================
    SHARED HELPERS
 ========================= */
+// In-memory cache so we do not repeatedly fetch accounts on every action.
 let customerAccountsCache = [];
 
+// Builds the Authorization header using the token saved in localStorage.
 function getAuthHeader() {
   return {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   };
 }
 
+// Loads customer accounts from API.
+// If `force` is false and cache already exists, it returns cached data.
 async function fetchCustomerAccounts(force = false) {
   if (!force && customerAccountsCache.length) return customerAccountsCache;
 
@@ -52,6 +65,7 @@ async function fetchCustomerAccounts(force = false) {
 /* =========================
    REAL-TIME DATE & TIME
 ========================= */
+// Creates a readable date-time string and writes it into the welcome header.
 function updateDateTime() {
   const now = new Date();
 
@@ -76,6 +90,8 @@ function updateDateTime() {
 /* =========================
    INITIAL DASHBOARD LOAD
 ========================= */
+// This is the main startup function for customer dashboard.
+// It opens default section, loads profile context, and starts live time updates.
 async function loadCustomerDashboard() {
   openAccounts(); // default view
 
@@ -119,6 +135,7 @@ async function loadCustomerDashboard() {
 /* =========================
    MY ACCOUNTS
 ========================= */
+// Opens Accounts section and renders all customer accounts as cards.
 async function openAccounts() {
   showSection("accountsSection");
 
@@ -152,6 +169,7 @@ async function openAccounts() {
 /* =========================
    TRANSFER MONEY
 ========================= */
+// Writes transfer status messages (normal/success/error) in a single place.
 function setTransferStatus(message, state) {
   const el = document.getElementById("transferMsg");
   if (!el) return;
@@ -163,6 +181,7 @@ function setTransferStatus(message, state) {
   if (state === "success") el.classList.add("status-success");
 }
 
+// Shows available balance for currently selected sender account.
 function updateBalanceHint() {
   const select = document.getElementById("fromAccount");
   const hint = document.getElementById("balanceHint");
@@ -180,6 +199,7 @@ function updateBalanceHint() {
   hint.innerText = `Available balance: INR ${Number(selected.balance).toLocaleString("en-IN")}`;
 }
 
+// Populates "from account" dropdown with customer-owned accounts.
 function populateFromAccounts(accounts) {
   const select = document.getElementById("fromAccount");
   if (!select) return;
@@ -193,6 +213,7 @@ function populateFromAccounts(accounts) {
   updateBalanceHint();
 }
 
+// Opens transfer section and prepares dropdown data.
 async function openTransfer() {
   showSection("transferSection");
   setTransferStatus("");
@@ -214,6 +235,7 @@ async function openTransfer() {
   }
 }
 
+// Validates transfer form, calls transfer API, then refreshes local account cache.
 async function submitTransfer(e) {
   e.preventDefault();
 
@@ -222,16 +244,19 @@ async function submitTransfer(e) {
   const amount = Number(document.getElementById("transferAmount").value);
   const desc = document.getElementById("transferDesc").value.trim();
 
+  // Basic validation before API call.
   if (!fromId || !toId || !amount || amount <= 0) {
     setTransferStatus("Please fill all fields with valid values.", "error");
     return;
   }
 
+  // Sender and receiver cannot be the same account.
   if (fromId === toId) {
     setTransferStatus("Sender and recipient accounts must be different.", "error");
     return;
   }
 
+  // Client-side guard: prevent transfer amount greater than known balance.
   const sourceAcc = customerAccountsCache.find(
     (acc) => Number(acc.account_id) === fromId,
   );
@@ -242,6 +267,7 @@ async function submitTransfer(e) {
 
   setTransferStatus("Processing transfer...");
 
+  // Make transfer request to backend.
   try {
     const res = await fetch(getApiUrl("customer/transfer"), {
       method: "POST",
@@ -276,6 +302,7 @@ async function submitTransfer(e) {
 /* =========================
    MY TRANSACTIONS (ON DEMAND)
 ========================= */
+// Opens transactions section and renders transaction table for this customer.
 async function openTransactions() {
   showSection("transactionsSection");
 
@@ -300,6 +327,7 @@ async function openTransactions() {
           : `Balance: \u20b9 ${totalBalance.toLocaleString("en-IN")}`;
     }
 
+    // Get transaction list from backend after accounts are ready.
     const res = await fetch(getApiUrl("customer/transactions"), {
       headers: getAuthHeader(),
     });
@@ -320,12 +348,14 @@ async function openTransactions() {
       accounts.map((acc) => [Number(acc.account_id), Number(acc.balance)]),
     );
 
+    // Helper: masks account id/number to last 4 chars.
     const last4 = (num) => {
       if (!num) return "----";
       const str = String(num);
       return str.slice(-4);
     };
 
+    // Helper: formats party label shown in from/to columns.
     const formatParty = (name, accNumber, id) => {
       if (!name && !accNumber && !id) return "Cash Desk";
       const label = name || (id ? `Account ${id}` : "Account");
@@ -333,6 +363,7 @@ async function openTransactions() {
     };
 
     txns.forEach((t) => {
+      // Determine whether row is incoming or outgoing for this user.
       const userAccountId = accountMap.has(Number(t.to_account_id))
         ? Number(t.to_account_id)
         : accountMap.has(Number(t.from_account_id))
@@ -346,6 +377,7 @@ async function openTransactions() {
       const amountNum = Number(t.amount);
       let balanceAfter = "—";
 
+      // Compute running balance backwards because list is newest-first.
       if (userAccountId !== null && runningBalances.has(userAccountId)) {
         balanceAfter = runningBalances.get(userAccountId);
         const delta = direction === "CREDIT" ? amountNum : -amountNum;
@@ -391,6 +423,7 @@ async function openTransactions() {
 /* =========================
    MY PROFILE (READ ONLY)
 ========================= */
+// Opens profile section and fills all profile fields with latest API data.
 async function openProfile() {
   showSection("profileSection");
 
@@ -431,6 +464,7 @@ async function openProfile() {
 /* =========================
    EVENT HOOKS
 ========================= */
+// Registers all one-time DOM event listeners after page loads.
 document.addEventListener("DOMContentLoaded", () => {
   const transferForm = document.getElementById("transferForm");
   if (transferForm) {
@@ -452,6 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* =========================
    LOANS
 ========================= */
+// Status metadata used to render user-friendly label and color.
 const LOAN_STATUS_META = {
   REQUESTED: { label: "Pending employee review", cls: "waiting" },
   EMPLOYEE_APPROVED: { label: "Awaiting manager decision", cls: "info" },
@@ -460,11 +495,13 @@ const LOAN_STATUS_META = {
   MANAGER_REJECTED: { label: "Rejected by manager", cls: "danger" },
 };
 
+// Converts raw backend status to styled status badge HTML.
 function formatLoanStatus(status) {
   const meta = LOAN_STATUS_META[status] || { label: status || "—", cls: "info" };
   return `<span class="loan-status ${meta.cls}">${meta.label}</span>`;
 }
 
+// Shows feedback message for loan form actions.
 function setLoanFormMsg(text, state) {
   const el = document.getElementById("loanFormMsg");
   if (!el) return;
@@ -474,11 +511,13 @@ function setLoanFormMsg(text, state) {
   if (state === "error") el.classList.add("status-error");
 }
 
+// Opens Loans section and loads current loan list.
 async function openLoans() {
   showSection("loansSection");
   loadLoans();
 }
 
+// Validates and submits new loan application for this customer.
 async function submitLoanApplication(e) {
   e.preventDefault();
 
@@ -486,6 +525,7 @@ async function submitLoanApplication(e) {
   const tenure = Number(document.getElementById("loanTenure").value);
   const purpose = document.getElementById("loanPurpose").value.trim();
 
+  // Basic loan form validation.
   if (!amount || amount <= 0 || !tenure) {
     setLoanFormMsg("Please enter a valid amount and tenure.", "error");
     return;
@@ -493,6 +533,7 @@ async function submitLoanApplication(e) {
 
   setLoanFormMsg("Submitting loan request...");
 
+  // Submit loan request.
   try {
     const res = await fetch(getApiUrl("customer/applyLoan"), {
       method: "POST",
@@ -518,6 +559,7 @@ async function submitLoanApplication(e) {
   }
 }
 
+// Fetches customer loan list and sends it to render function.
 async function loadLoans() {
   const tbody = document.getElementById("loanTable");
   if (tbody) {
@@ -539,6 +581,7 @@ async function loadLoans() {
   }
 }
 
+// Renders loan table rows with status badge, timestamps, and comments.
 function renderLoans(loans = []) {
   const tbody = document.getElementById("loanTable");
   if (!tbody) return;

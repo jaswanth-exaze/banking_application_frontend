@@ -1,4 +1,11 @@
+/**
+ * Manager dashboard script.
+ * Handles branch overview, employee/customer views, branch transactions, and loan approvals.
+ */
+
 /* SECTION TOGGLER */
+// This function hides all sections, shows only the requested section,
+// and updates active nav state.
 function showSection(id) {
   document
     .querySelectorAll(".section")
@@ -14,6 +21,7 @@ function showSection(id) {
   setActiveNav(map[id] || id);
 }
 
+// Removes active class from all nav items and activates only selected key.
 function setActiveNav(key) {
   document.querySelectorAll(".nav-item").forEach((btn) => {
     btn.classList.remove("active");
@@ -23,9 +31,12 @@ function setActiveNav(key) {
 }
 
 /* DASHBOARD */
+// Initial manager dashboard loader:
+// opens dashboard, decodes branch id from token, and loads summary cards.
 async function loadManagerDashboard() {
   showSection("dashboard");
 
+  // Read branch id from JWT payload so we can show fallback immediately.
   const token = localStorage.getItem("token");
   let branchIdFromToken = "—";
   try {
@@ -35,7 +46,7 @@ async function loadManagerDashboard() {
     console.warn("Failed to read branch id from token", err);
   }
 
-  /* Welcome + Branch */
+  // Set placeholder/fallback header values before API data returns.
   document.getElementById("welcomeText").innerText = "Welcome Branch Manager";
 
   document.getElementById("branchName").innerText = "Branch —";
@@ -46,7 +57,7 @@ async function loadManagerDashboard() {
   updateDateTime();
   setInterval(updateDateTime, 60000);
 
-  /* Fetch dashboard summary */
+  // Fetch official branch metrics and replace placeholders.
   try {
     const res = await fetch(getApiUrl("manager/dashboard-summary"), {
       headers: {
@@ -86,6 +97,7 @@ async function loadManagerDashboard() {
 }
 
 /* DATE & TIME */
+// Renders current date/time in manager welcome header.
 function updateDateTime() {
   const now = new Date();
 
@@ -108,11 +120,13 @@ function updateDateTime() {
 }
 
 /* EMPLOYEES */
+// Opens employees section and loads employee table.
 async function openEmployees() {
   showSection("employees");
   loadEmployees();
 }
 
+// Fetches branch employees and renders table rows.
 async function loadEmployees() {
   const token = localStorage.getItem("token");
   const tbody = document.getElementById("employeeTable");
@@ -151,11 +165,13 @@ async function loadEmployees() {
 }
 
 /* CUSTOMERS */
+// Opens customers section and loads customer table.
 async function openCustomers() {
   showSection("customers");
   loadCustomers();
 }
 
+// Fetches branch customers and renders table rows.
 async function loadCustomers() {
   const token = localStorage.getItem("token");
   const tbody = document.getElementById("customerTable");
@@ -192,13 +208,16 @@ async function loadCustomers() {
 
 /* TRANSACTIONS */
 const MGR_TXN_LIMIT = 15;
+// Tracks current page and total count for manager transaction pagination.
 let mgrTxnState = { page: 1, total: 0 };
 
+// Opens transactions section and loads first page.
 function openTransactions() {
   showSection("transactions");
   loadManagerTransactions(1);
 }
 
+// Formats sender/receiver label with safe fallback values.
 function formatParty(name, accountNumber, customerId, userId) {
   if (!name && !accountNumber && !customerId && !userId) return "—";
   const trimmed = name ? name.trim() : "";
@@ -216,6 +235,7 @@ function formatParty(name, accountNumber, customerId, userId) {
   return `${label}${suffix}`;
 }
 
+// Renders manager transaction table rows.
 function renderManagerTxns(txns) {
   const tbody = document.getElementById("mgrTxnTable");
   if (!tbody) return;
@@ -257,6 +277,7 @@ function renderManagerTxns(txns) {
   });
 }
 
+// Updates pagination info and button enabled/disabled state.
 function updateMgrPager() {
   const meta = document.getElementById("mgrTxnPageMeta");
   const prev = document.getElementById("mgrTxnPrevBtn");
@@ -272,15 +293,18 @@ function updateMgrPager() {
   if (next) next.disabled = mgrTxnState.page >= totalPages;
 }
 
+// Loads manager transactions using pagination and optional filters.
 async function loadManagerTransactions(page = 1) {
   const tbody = document.getElementById("mgrTxnTable");
   if (tbody) {
     tbody.innerHTML = `<tr><td colspan="6" class="loader"></td></tr>`;
   }
 
+  // Read optional customer/user filters from UI inputs.
   const customerId = document.getElementById("mgrTxnCustomerId")?.value.trim();
   const userId = document.getElementById("mgrTxnUserId")?.value.trim();
 
+  // Build query params for paginated API call.
   const params = new URLSearchParams({
     page: page.toString(),
     limit: MGR_TXN_LIMIT.toString(),
@@ -312,6 +336,7 @@ async function loadManagerTransactions(page = 1) {
   }
 }
 
+// Register UI event listeners after DOM is ready.
 document.addEventListener("DOMContentLoaded", () => {
   const filterForm = document.getElementById("mgrTxnFilterForm");
   if (filterForm) {
@@ -361,6 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// Mapping used to display friendly loan status label and style.
 const LOAN_STATUS_META = {
   REQUESTED: { label: "Pending employee review", cls: "waiting" },
   EMPLOYEE_APPROVED: { label: "Awaiting manager decision", cls: "info" },
@@ -369,6 +395,7 @@ const LOAN_STATUS_META = {
   MANAGER_REJECTED: { label: "Rejected by manager", cls: "danger" },
 };
 
+// Converts raw status code into styled badge HTML.
 function formatLoanStatus(status) {
   const meta = LOAN_STATUS_META[status] || {
     label: status || "—",
@@ -377,6 +404,7 @@ function formatLoanStatus(status) {
   return `<span class="loan-status ${meta.cls}">${meta.label}</span>`;
 }
 /* LOANS */
+// Displays feedback message for manager loan actions.
 function setManagerLoanMsg(text, state) {
   const el = document.getElementById("mgrLoanMsg");
   if (!el) return;
@@ -386,12 +414,14 @@ function setManagerLoanMsg(text, state) {
   if (state === "error") el.classList.add("status-error");
 }
 
+// Opens loan section and loads both pending queue + full history table.
 function openManagerLoans() {
   showSection("loans");
   loadManagerLoans();
   loadAllManagerLoans();
 }
 
+// Renders pending manager-loan queue with action buttons.
 function renderManagerLoans(loans = []) {
   const tbody = document.getElementById("mgrLoanTable");
   if (!tbody) return;
@@ -438,6 +468,7 @@ function renderManagerLoans(loans = []) {
   });
 }
 
+// Fetches loans waiting for manager decision.
 async function loadManagerLoans() {
   const tbody = document.getElementById("mgrLoanTable");
   if (tbody) {
@@ -468,6 +499,7 @@ async function loadManagerLoans() {
   }
 }
 
+// Submits manager approve/reject decision for specific loan.
 async function handleManagerLoanDecision(loanId, action) {
   if (!loanId || !action) return;
   const commentInput = document.querySelector(
@@ -499,6 +531,7 @@ async function handleManagerLoanDecision(loanId, action) {
   }
 }
 
+// Loads complete branch loan list (all statuses).
 async function loadAllManagerLoans() {
   const tbody = document.getElementById("mgrAllLoanTable");
   if (tbody) {
@@ -521,6 +554,7 @@ async function loadAllManagerLoans() {
   }
 }
 
+// Renders full branch loan history table.
 function renderAllManagerLoans(loans = []) {
   const tbody = document.getElementById("mgrAllLoanTable");
   if (!tbody) return;

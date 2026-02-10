@@ -1,6 +1,9 @@
-// API Configuration
-// Centralized API base URL handling for local + production
+/**
+ * Frontend API configuration.
+ * Exposes a single URL builder so all fetch calls stay consistent.
+ */
 
+// Resolves the backend origin for both local and deployed usage.
 const API_BASE_URL =
   window.API_BASE_URL ||
   (window.location.hostname === "localhost" ||
@@ -8,15 +11,16 @@ const API_BASE_URL =
     ? "https://bankingapplication-production.up.railway.app"
     : "https://bankingapplication-production.up.railway.app");
 
-// Export API base URL
+// Makes the resolved base URL available globally.
 window.API_BASE_URL = API_BASE_URL;
 
-// Helper function to build API URLs
+// Builds a full API URL while safely handling leading slashes.
 function getApiUrl(endpoint) {
-
+  // Normalize endpoint so `/auth/login` and `auth/login` both work.
   const cleanEndpoint = endpoint.startsWith("/")
     ? endpoint.substring(1)
     : endpoint;
 
+  // Return absolute URL used by fetch calls.
   return `${API_BASE_URL}/${cleanEndpoint}`;
 }
