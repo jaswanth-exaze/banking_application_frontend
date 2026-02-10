@@ -366,7 +366,7 @@ async function submitDeposit(e) {
 
   // Call deposit API endpoint.
   try {
-    const res = await fetch(getApiUrl("employee/deposite"), {
+    const res = await fetch(getApiUrl("employee/deposit"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -421,7 +421,7 @@ async function submitWithdrawal(e) {
 
   // Call withdrawal API endpoint.
   try {
-    const res = await fetch(getApiUrl("employee/withdrawl"), {
+    const res = await fetch(getApiUrl("employee/withdrawal"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
