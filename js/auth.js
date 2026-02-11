@@ -1,20 +1,18 @@
 /**
  * Frontend auth helpers.
- * Centralizes token access, session-expiry handling, and route protection.
+ * Basic token/session handling with simple refresh-on-401 behavior.
  */
 
 const SESSION_EXPIRED_KEY = "sessionExpiredMessage";
-const AUTH_ROUTE_PATTERN = /^\/auth\/(login|refresh|logout)\/?$/;
-let refreshInFlight = null;
-let redirectInProgress = false;
+let alreadyRedirected = false;
 
 // Returns the JWT saved after login.
 function getToken() {
   return localStorage.getItem("token");
 }
 
-// Persists a one-time message that is displayed after redirect.
-function setSessionExpiredMessage(message) {
+// Saves one-time message shown on login page after redirect.
+function saveSessionMessage(message) {
   if (message) {
     localStorage.setItem(SESSION_EXPIRED_KEY, message);
   }
@@ -31,142 +29,110 @@ function clearAuthState() {
   localStorage.removeItem("role");
 }
 
-// Clears auth state and redirects to the login page.
+// Clears auth state and sends user to login page.
 function redirectToLogin(message) {
-  if (redirectInProgress) return;
-  redirectInProgress = true;
+  if (alreadyRedirected) return;
+  alreadyRedirected = true;
 
-  setSessionExpiredMessage(message || "Login session expired. Please log in again.");
+  saveSessionMessage(message || "Login session expired. Please log in again.");
   clearAuthState();
   window.location.href = "/login.html";
 }
 
-// Builds normalized request URL from any fetch input type.
-function getRequestUrl(input) {
-  if (typeof input === "string") return input;
-  if (input instanceof URL) return input.toString();
-  if (input instanceof Request) return input.url;
-  return String(input || "");
-}
-
-// Determines whether request points to backend API and auth routes.
-function getRequestMeta(url) {
-  try {
-    const requestUrl = new URL(url, window.location.origin);
-    const apiBase = new URL(window.API_BASE_URL);
-
-    return {
-      isApiRequest: requestUrl.origin === apiBase.origin,
-      isAuthRoute: AUTH_ROUTE_PATTERN.test(requestUrl.pathname),
-    };
-  } catch (err) {
-    return { isApiRequest: false, isAuthRoute: false };
-  }
-}
-
-// Applies API defaults (credentials + latest Authorization header).
-function buildApiInit(input, init = {}, tokenOverride) {
-  const options = { ...init, credentials: "include" };
-  const headers = new Headers(
-    options.headers || (input instanceof Request ? input.headers : {}),
+// Checks if URL is an auth endpoint where we should not attach bearer token.
+function isAuthEndpoint(url) {
+  return (
+    url.includes("/auth/login")
+    || url.includes("/auth/refresh")
+    || url.includes("/auth/logout")
   );
-  const token = tokenOverride || getToken();
+}
 
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+// Checks if request is for backend API.
+function isApiRequest(url) {
+  return typeof url === "string" && url.startsWith(window.API_BASE_URL);
+}
+
+// Adds credentials and optional bearer token to request options.
+function buildRequestOptions(init, addBearerToken) {
+  const options = { ...(init || {}), credentials: "include" };
+  const headers = new Headers(options.headers || {});
+
+  if (addBearerToken) {
+    const token = getToken();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+  } else {
+    headers.delete("Authorization");
   }
 
   options.headers = headers;
   return options;
 }
 
-// Reads a user-friendly message from error payload when available.
+// Reads backend message from error response, if available.
 async function getErrorMessage(res) {
   try {
     const data = await res.clone().json();
-    if (data?.message) return data.message;
+    if (data && data.message) return data.message;
   } catch (err) {
-    // Fall back to default message when response is not JSON.
+    // Ignore parse failure and use default message.
   }
 
   return "Login session expired. Please log in again.";
 }
 
-// Requests a fresh access token using refresh-token cookie.
-async function refreshAccessToken(originalFetch) {
-  if (refreshInFlight) return refreshInFlight;
-
-  refreshInFlight = (async () => {
-    try {
-      const res = await originalFetch(getApiUrl("auth/refresh"), {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!res.ok) return false;
-
-      const data = await res.json();
-      if (!data?.token) return false;
-
-      localStorage.setItem("token", data.token);
-      if (data.role) {
-        localStorage.setItem("role", data.role);
-      }
-      return true;
-    } catch (err) {
-      return false;
-    } finally {
-      refreshInFlight = null;
-    }
-  })();
-
-  return refreshInFlight;
-}
-
-// Installs a single global fetch interceptor to catch 401 responses.
-function installAuthInterceptor() {
-  // Prevent duplicate wrapping if this file is loaded more than once.
+// Installs one global fetch wrapper:
+// - attaches credentials + bearer token
+// - if 401 happens, tries refresh once and retries original request
+function installAuthWrapper() {
   if (window.__authInterceptorInstalled) return;
   window.__authInterceptorInstalled = true;
 
-  // Keep original fetch, then wrap it with auth-expiry handling.
   const originalFetch = window.fetch.bind(window);
 
   window.fetch = async (input, init = {}) => {
-    const url = getRequestUrl(input);
-    const { isApiRequest, isAuthRoute } = getRequestMeta(url);
+    const requestUrl = typeof input === "string" ? input : input.url;
+    const apiCall = isApiRequest(requestUrl);
+    const authCall = isAuthEndpoint(requestUrl || "");
 
-    const requestInit = isApiRequest ? buildApiInit(input, init) : init;
-    if (isApiRequest && isAuthRoute) {
-      const authHeaders = new Headers(requestInit.headers || {});
-      authHeaders.delete("Authorization");
-      requestInit.headers = authHeaders;
+    const requestOptions = apiCall
+      ? buildRequestOptions(init, !authCall)
+      : init;
+
+    let response = await originalFetch(input, requestOptions);
+
+    if (!apiCall || response.status !== 401 || authCall) {
+      return response;
     }
 
-    const res = await originalFetch(input, requestInit);
+    // Try to refresh access token using refresh-token cookie.
+    const refreshRes = await originalFetch(getApiUrl("auth/refresh"), {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => null);
 
-    if (!isApiRequest || res.status !== 401) {
-      return res;
+    if (refreshRes && refreshRes.ok) {
+      const refreshData = await refreshRes.json().catch(() => null);
+      if (refreshData && refreshData.token) {
+        localStorage.setItem("token", refreshData.token);
+        if (refreshData.role) localStorage.setItem("role", refreshData.role);
+
+        const retryOptions = buildRequestOptions(init, true);
+        response = await originalFetch(input, retryOptions);
+        return response;
+      }
     }
 
-    if (isAuthRoute) {
-      return res;
-    }
-
-    const didRefresh = await refreshAccessToken(originalFetch);
-    if (didRefresh) {
-      const retryInit = buildApiInit(input, requestInit, getToken());
-      return originalFetch(input, retryInit);
-    }
-
-    const message = await getErrorMessage(res);
+    const message = await getErrorMessage(response);
     redirectToLogin(message);
-    return res;
+    return response;
   };
 }
 
-// Enable interceptor as soon as this script loads.
-installAuthInterceptor();
+// Enable wrapper as soon as this script loads.
+installAuthWrapper();
 
 // Protects dashboard pages by validating token presence and expected role.
 function protectPage(role) {
