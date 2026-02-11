@@ -592,15 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Clears auth data and redirects employee back to the login screen.
 function logoutEmployee() {
-  // Clear auth data
-  localStorage.removeItem("token");
-
-  // Optional: clear other stored data
-  localStorage.removeItem("user");
-
-  // Redirect to login page
-  window.location.href = "/login.html";
-  // 👆 adjust path if your login page is different
+  logout();
 }
 
 /* =========================================================
@@ -734,3 +726,5 @@ async function handleEmployeeLoanDecision(loanId, action) {
     setEmployeeLoanMsg(err.message || "Unable to update loan", "error");
   }
 }
+
+

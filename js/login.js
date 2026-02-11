@@ -18,22 +18,24 @@ async function login() {
   const res = await fetch(getApiUrl("auth/login"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ username, password })
   });
 
   // Parse backend response (success payload or error payload).
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
 
   // If login failed, show backend message and stop.
   if (!res.ok) {
     msg.style.color = "red";
-    msg.innerText = data.message;
+    msg.innerText = data.message || "Login failed. Please try again.";
     return;
   }
 
   // Save auth session data for protected pages.
   localStorage.setItem("token", data.token);
   localStorage.setItem("role", data.role);
+  localStorage.removeItem("sessionExpiredMessage");
 
   // Redirect based on role returned by backend.
   if (data.role === "CUSTOMER")
